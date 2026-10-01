@@ -117,10 +117,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       draw() {
+        const theme = document.documentElement.getAttribute('data-theme') || 'aurora';
+        let fill = 'rgba(0, 229, 153, 0.55)';
+        let shadow = '#00E599';
+        if (theme === 'violet') {
+          fill = 'rgba(168, 85, 247, 0.6)';
+          shadow = '#a855f7';
+        } else if (theme === 'cyberpunk') {
+          fill = 'rgba(244, 63, 94, 0.6)';
+          shadow = '#f43f5e';
+        } else if (theme === 'aurora') {
+          fill = 'rgba(0, 242, 254, 0.6)';
+          shadow = '#00f2fe';
+        }
+
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 229, 153, 0.55)';
-        ctx.shadowColor = '#00E599';
+        ctx.fillStyle = fill;
+        ctx.shadowColor = shadow;
         ctx.shadowBlur = 6;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -135,6 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.clearRect(0, 0, width, height);
 
       // Connect lines
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'aurora';
+      let strokeRgb = '0, 229, 153';
+      if (currentTheme === 'violet') strokeRgb = '168, 85, 247';
+      else if (currentTheme === 'cyberpunk') strokeRgb = '244, 63, 94';
+      else if (currentTheme === 'aurora') strokeRgb = '0, 242, 254';
+
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -146,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             const alpha = (1 - dist / 110) * 0.18;
-            ctx.strokeStyle = `rgba(0, 229, 153, ${alpha})`;
+            ctx.strokeStyle = `rgba(${strokeRgb}, ${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.stroke();
           }
@@ -413,4 +433,61 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // 14. Interactive Theme Palette Switcher
+  const themeMenuBtn = document.getElementById('theme-menu-btn');
+  const themeMenuPopover = document.getElementById('theme-menu-popover');
+  const themeOptions = document.querySelectorAll('.theme-option');
+
+  function setTheme(themeName) {
+    document.documentElement.setAttribute('data-theme', themeName);
+    themeOptions.forEach((opt) => {
+      if (opt.getAttribute('data-theme') === themeName) {
+        opt.classList.add('active');
+      } else {
+        opt.classList.remove('active');
+      }
+    });
+    try {
+      localStorage.setItem('sijin_portfolio_theme', themeName);
+    } catch (e) {
+      // LocalStorage access might be restricted in some sandboxes
+    }
+  }
+
+  // Initialize theme from storage or default to 'aurora'
+  let savedTheme = 'aurora';
+  try {
+    savedTheme = localStorage.getItem('sijin_portfolio_theme') || 'aurora';
+  } catch (e) {}
+  setTheme(savedTheme);
+
+  if (themeMenuBtn && themeMenuPopover) {
+    themeMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = themeMenuPopover.classList.toggle('open');
+      themeMenuBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!themeMenuPopover.contains(e.target) && !themeMenuBtn.contains(e.target)) {
+        themeMenuPopover.classList.remove('open');
+        themeMenuBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  themeOptions.forEach((opt) => {
+    opt.addEventListener('click', () => {
+      const selectedTheme = opt.getAttribute('data-theme');
+      const themeLabel = opt.querySelector('span:last-child')?.textContent || selectedTheme;
+      setTheme(selectedTheme);
+      if (themeMenuPopover) {
+        themeMenuPopover.classList.remove('open');
+        if (themeMenuBtn) themeMenuBtn.setAttribute('aria-expanded', 'false');
+      }
+      showToast(`Switched theme to ${themeLabel} ✨`);
+    });
+  });
 });
+
