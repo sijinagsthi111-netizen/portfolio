@@ -359,6 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (terminalCloseBtn) terminalCloseBtn.addEventListener('click', closeTerminal);
   if (terminalExitIcon) terminalExitIcon.addEventListener('click', closeTerminal);
 
+  const dockTermBtn = document.getElementById('dock-term-btn');
+  if (dockTermBtn) dockTermBtn.addEventListener('click', openTerminal);
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && terminalModal && terminalModal.classList.contains('open')) {
       closeTerminal();
@@ -444,32 +447,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 13. Mobile Navigation Toggle & Outside-Click Close
-  if (mobileToggle && navMenu) {
+  // 13. Mobile Navigation Drawer & Backdrop System
+  const mobileNavBackdrop = document.getElementById('mobile-nav-backdrop');
+  const mobileNavClose = document.getElementById('mobile-nav-close');
+  const mobileTermTrigger = document.getElementById('mobile-term-trigger');
+
+  function openMobileMenu() {
+    if (navMenu) navMenu.classList.add('mobile-open');
+    if (mobileToggle) {
+      mobileToggle.classList.add('active');
+      mobileToggle.setAttribute('aria-expanded', 'true');
+    }
+    if (mobileNavBackdrop) mobileNavBackdrop.classList.add('active');
+  }
+
+  function closeMobileMenu() {
+    if (navMenu) navMenu.classList.remove('mobile-open');
+    if (mobileToggle) {
+      mobileToggle.classList.remove('active');
+      mobileToggle.setAttribute('aria-expanded', 'false');
+    }
+    if (mobileNavBackdrop) mobileNavBackdrop.classList.remove('active');
+  }
+
+  if (mobileToggle) {
     mobileToggle.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = navMenu.classList.toggle('mobile-open');
-      mobileToggle.classList.toggle('active', isOpen);
-      mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
-
-    document.querySelectorAll('.nav-link').forEach((link) => {
-      link.addEventListener('click', () => {
-        navMenu.classList.remove('mobile-open');
-        mobileToggle.classList.remove('active');
-        mobileToggle.setAttribute('aria-expanded', 'false');
-      });
-    });
-
-    // Close when tapping anywhere outside the nav on mobile
-    document.addEventListener('click', (e) => {
-      if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-        if (navMenu.classList.contains('mobile-open')) {
-          navMenu.classList.remove('mobile-open');
-          mobileToggle.classList.remove('active');
-          mobileToggle.setAttribute('aria-expanded', 'false');
-        }
+      if (navMenu && navMenu.classList.contains('mobile-open')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
       }
+    });
+  }
+
+  if (mobileNavClose) mobileNavClose.addEventListener('click', closeMobileMenu);
+  if (mobileNavBackdrop) mobileNavBackdrop.addEventListener('click', closeMobileMenu);
+
+  document.querySelectorAll('.nav-link').forEach((link) => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+
+  if (mobileTermTrigger) {
+    mobileTermTrigger.addEventListener('click', () => {
+      closeMobileMenu();
+      openTerminal();
     });
   }
 
