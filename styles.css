@@ -963,6 +963,99 @@ body {
 /* ==========================================================================
    Certifications & Education
    ========================================================================== */
+.resume-download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(0, 229, 153, 0.08) 0%, rgba(20, 26, 39, 0.9) 100%);
+  border: 1px solid rgba(0, 229, 153, 0.35);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 229, 153, 0.1);
+  transition: var(--transition);
+}
+
+.resume-download-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 30px rgba(0, 229, 153, 0.25);
+  transform: translateY(-2px);
+}
+
+.resume-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 229, 153, 0.12);
+  border: 1px solid rgba(0, 229, 153, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(0, 229, 153, 0.2);
+}
+
+.resume-info {
+  flex-grow: 1;
+}
+
+.resume-info h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.resume-info p {
+  font-size: 0.82rem;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.resume-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-resume-view,
+.btn-resume-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-resume-view {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: #f1f5f9;
+}
+
+.btn-resume-view:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+}
+
+.btn-resume-download {
+  background: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  color: #03140c;
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.btn-resume-download:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px rgba(0, 229, 153, 0.6);
+  transform: translateY(-1px);
+}
+
 .cred-card {
   display: flex;
   align-items: center;
@@ -1417,6 +1510,16 @@ body {
 
   .services-grid {
     grid-template-columns: 1fr;
+  }
+
+  .resume-download-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .resume-action-buttons {
+    width: 100%;
+    margin-top: 8px;
   }
 
   .footer-top,
