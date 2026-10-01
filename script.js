@@ -359,9 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (terminalCloseBtn) terminalCloseBtn.addEventListener('click', closeTerminal);
   if (terminalExitIcon) terminalExitIcon.addEventListener('click', closeTerminal);
 
-  const dockTermBtn = document.getElementById('dock-term-btn');
-  if (dockTermBtn) dockTermBtn.addEventListener('click', openTerminal);
-
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && terminalModal && terminalModal.classList.contains('open')) {
       closeTerminal();
