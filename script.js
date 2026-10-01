@@ -1,15 +1,29 @@
 /**
- * Sijin Agasthi - Interactive Portfolio Scripts
+ * Sijin Agasthi - Ultra-Creative Interactive Portfolio Engine
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Elements
+  const preloader = document.getElementById('preloader');
+  const preloaderBar = document.getElementById('preloader-bar');
+  const preloaderFill = document.getElementById('preloader-fill');
+  const spotlight = document.getElementById('cursor-spotlight');
+  const canvas = document.getElementById('particle-canvas');
   const toast = document.getElementById('toast');
-  const phoneCopyBtn = document.getElementById('phone-copy-btn');
-  const searchInput = document.getElementById('site-search');
-  const searchBtn = document.getElementById('search-btn');
-  const contactForm = document.getElementById('contact-form');
+  const typewriterText = document.getElementById('typewriter-text');
   const mobileToggle = document.getElementById('mobile-toggle');
   const navMenu = document.getElementById('nav-menu');
+  const phoneCopyBtn = document.getElementById('phone-copy-btn');
+  const contactForm = document.getElementById('contact-form');
+
+  // Terminal Elements
+  const terminalModal = document.getElementById('terminal-modal');
+  const terminalToggleBtn = document.getElementById('terminal-toggle-btn');
+  const terminalCloseBtn = document.getElementById('terminal-close-btn');
+  const terminalExitIcon = document.getElementById('terminal-exit-icon');
+  const terminalInput = document.getElementById('terminal-input');
+  const terminalHistory = document.getElementById('terminal-history');
+  const terminalChips = document.querySelectorAll('.term-chip');
 
   // Carousel Elements
   const prevProjectBtn = document.getElementById('prev-project-btn');
@@ -18,8 +32,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const indicatorDots = document.querySelectorAll('.indicator-dot');
   let currentProjectIndex = 0;
 
-  // 1. Toast Notification Helper
-  function showToast(message, duration = 3500) {
+  // 2. Cinematic Preloader Sequence
+  setTimeout(() => {
+    if (preloaderBar) preloaderBar.style.width = '100%';
+    if (preloaderFill) preloaderFill.classList.add('filled');
+  }, 100);
+
+  setTimeout(() => {
+    if (preloader) {
+      preloader.classList.add('fade-out');
+      document.body.classList.remove('loading');
+    }
+  }, 1100);
+
+  // 3. Toast Helper
+  function showToast(message, duration = 3200) {
     if (!toast) return;
     toast.textContent = message;
     toast.classList.add('show');
@@ -29,11 +56,200 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
 
-  // 2. Project Carousel Logic
+  // 4. Cursor Spotlight Tracker
+  if (spotlight && window.matchMedia('(pointer: fine)').matches) {
+    window.addEventListener('mousemove', (e) => {
+      spotlight.style.left = `${e.clientX}px`;
+      spotlight.style.top = `${e.clientY}px`;
+    });
+  }
+
+  // 5. Interactive Constellation Canvas
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const count = Math.min(width < 768 ? 25 : 55, 65);
+    const mouse = { x: null, y: null, radius: 120 };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.radius = Math.random() * 1.8 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+        // Mouse avoidance/attraction
+        if (mouse.x != null && mouse.y != null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            this.x -= (dx / dist) * force * 1.8;
+            this.y -= (dy / dist) * force * 1.8;
+          }
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 229, 153, 0.55)';
+        ctx.shadowColor = '#00E599';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Connect lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const alpha = (1 - dist / 110) * 0.18;
+            ctx.strokeStyle = `rgba(0, 229, 153, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  }
+
+  // 6. Dynamic Typewriter Effect
+  if (typewriterText) {
+    const roles = [
+      'Software Developer & AI Engineer',
+      '.NET Core & C# Architect',
+      'Generative AI & LLM Specialist',
+      'Computer Vision Innovator',
+      'Data Analytics & Power BI Pro'
+    ];
+    let roleIdx = 0;
+    let charIdx = 0;
+    let isDeleting = false;
+    let typingDelay = 90;
+
+    function typeLoop() {
+      const currentRole = roles[roleIdx];
+      if (isDeleting) {
+        typewriterText.textContent = currentRole.substring(0, charIdx - 1);
+        charIdx--;
+        typingDelay = 45;
+      } else {
+        typewriterText.textContent = currentRole.substring(0, charIdx + 1);
+        charIdx++;
+        typingDelay = 90;
+      }
+
+      if (!isDeleting && charIdx === currentRole.length) {
+        typingDelay = 1800; // pause at end
+        isDeleting = true;
+      } else if (isDeleting && charIdx === 0) {
+        isDeleting = false;
+        roleIdx = (roleIdx + 1) % roles.length;
+        typingDelay = 400; // pause before next
+      }
+
+      setTimeout(typeLoop, typingDelay);
+    }
+    setTimeout(typeLoop, 800);
+  }
+
+  // 7. 3D Mouse Tilt Effect on Elements
+  const tiltItems = document.querySelectorAll('.tilt-item, #profile-tilt-card');
+  if (window.matchMedia('(pointer: fine)').matches) {
+    tiltItems.forEach((card) => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -9;
+        const rotateY = ((x - centerX) / centerX) * 9;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      });
+    });
+  }
+
+  // 8. Interactive Skills Filter Tabs
+  const skillTabs = document.querySelectorAll('.skill-tab');
+  const techCards = document.querySelectorAll('.tech-badge-card');
+
+  skillTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      skillTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.getAttribute('data-filter');
+      techCards.forEach((card) => {
+        const categories = card.getAttribute('data-category') || '';
+        if (filter === 'all' || categories.includes(filter)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // 9. Projects Carousel Logic
   function setProject(index) {
     if (projectCards.length === 0) return;
-    
-    // Bounds wrapping
     if (index < 0) {
       currentProjectIndex = projectCards.length - 1;
     } else if (index >= projectCards.length) {
@@ -59,79 +275,123 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (prevProjectBtn) {
-    prevProjectBtn.addEventListener('click', () => setProject(currentProjectIndex - 1));
-  }
-  if (nextProjectBtn) {
-    nextProjectBtn.addEventListener('click', () => setProject(currentProjectIndex + 1));
-  }
+  if (prevProjectBtn) prevProjectBtn.addEventListener('click', () => setProject(currentProjectIndex - 1));
+  if (nextProjectBtn) nextProjectBtn.addEventListener('click', () => setProject(currentProjectIndex + 1));
 
   indicatorDots.forEach((dot) => {
     dot.addEventListener('click', () => {
-      const index = parseInt(dot.getAttribute('data-index'), 10);
-      setProject(index);
+      const idx = parseInt(dot.getAttribute('data-index'), 10);
+      setProject(idx);
     });
   });
 
-  // 4. Copy Phone to Clipboard
+  // 10. Copy Phone / Direct Email
   if (phoneCopyBtn) {
     phoneCopyBtn.addEventListener('click', () => {
-      const phone = '8593990351';
-      navigator.clipboard.writeText(phone).then(() => {
-        showToast('📞 Phone number copied: 8593990351');
+      navigator.clipboard.writeText('8593990351').then(() => {
+        showToast('📞 Phone copied: +91 8593990351');
       }).catch(() => {
         showToast('Phone: +91 8593990351');
       });
     });
   }
 
-  // 5. Interactive Search Bar
-  function performSearch() {
-    if (!searchInput) return;
-    const query = searchInput.value.trim().toLowerCase();
-    if (!query) {
-      showToast('Please type a keyword (e.g., Python, .NET, VisionAid)');
+  // 11. Interactive Hacker Terminal Logic
+  function openTerminal() {
+    if (terminalModal) {
+      terminalModal.classList.add('open');
+      terminalModal.setAttribute('aria-hidden', 'false');
+      if (terminalInput) terminalInput.focus();
+    }
+  }
+
+  function closeTerminal() {
+    if (terminalModal) {
+      terminalModal.classList.remove('open');
+      terminalModal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  if (terminalToggleBtn) terminalToggleBtn.addEventListener('click', openTerminal);
+  if (terminalCloseBtn) terminalCloseBtn.addEventListener('click', closeTerminal);
+  if (terminalExitIcon) terminalExitIcon.addEventListener('click', closeTerminal);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && terminalModal && terminalModal.classList.contains('open')) {
+      closeTerminal();
+    }
+    // Quick shortcut backtick opens terminal
+    if (e.key === '`' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+      e.preventDefault();
+      if (terminalModal.classList.contains('open')) closeTerminal();
+      else openTerminal();
+    }
+  });
+
+  const commands = {
+    help: 'Available commands:\n  • whoami    - About Sijin Agasthi\n  • skills    - Technical toolkit & stack\n  • projects  - Highlighted engineering builds\n  • resume    - Download or view curriculum vitae\n  • contact   - Reach out via email, phone, or WhatsApp\n  • clear     - Clear terminal window',
+    whoami: 'Sijin Agasthi — Software Developer & AI Engineer\nLocation: Kannur, Kerala (Open to Remote / Worldwide)\nDegree: B.Tech, Vimal Jyothi Engineering College\nFocus: Building scalable .NET backend architectures & applied Generative AI systems.',
+    skills: 'Technical Stack Overview:\n  Languages: Python, C#, Java, C, C++, R\n  Frameworks: .NET Core, ASP.NET, REST APIs\n  AI / ML: Generative AI, Multimodal LLMs, PyTorch, OpenCV, LSTM-KNN\n  Analytics: Power BI, Power Query, Matplotlib, Statistical Modeling\n  Tools: Git, GitHub, Raspberry Pi, Software QA Testing',
+    projects: 'Featured Projects:\n  1. VisionAid: Assistive glasses with Raspberry Pi, camera & multimodal LLMs for scene-to-speech.\n  2. Driver Drowsiness Monitoring: Real-time ML face tracking & EAR fatigue alarm (81.5% accuracy).',
+    resume: 'Resume PDF is ready. Opening PDF document...',
+    contact: 'Contact Sijin Agasthi:\n  Email:    sijinagsthi111@gmail.com\n  Phone:    +91 8593990351\n  WhatsApp: https://wa.me/918593990351\n  GitHub:   https://github.com/sijinagsthi111-netizen',
+    clear: ''
+  };
+
+  function executeCommand(rawCmd) {
+    const cmd = rawCmd.trim().toLowerCase();
+    if (!cmd) return;
+
+    // Echo input
+    const userLine = document.createElement('div');
+    userLine.className = 'term-line';
+    userLine.innerHTML = `<span class="term-prompt">sijin@dev:~$</span> <span class="output-success">${cmd}</span>`;
+    terminalHistory.appendChild(userLine);
+
+    if (cmd === 'clear') {
+      terminalHistory.innerHTML = '';
+      if (terminalInput) terminalInput.value = '';
       return;
     }
 
-    if (query.includes('project') || query.includes('vision') || query.includes('drowsiness') || query.includes('ai') || query.includes('ml')) {
-      const projectsSection = document.getElementById('projects');
-      if (projectsSection) {
-        projectsSection.scrollIntoView({ behavior: 'smooth' });
-        showToast(`Showing projects related to "${query}"`);
-      }
-    } else if (query.includes('.net') || query.includes('c#') || query.includes('service') || query.includes('what i do')) {
-      const servicesSection = document.getElementById('services');
-      if (servicesSection) {
-        servicesSection.scrollIntoView({ behavior: 'smooth' });
-        showToast(`Navigated to services for "${query}"`);
-      }
-    } else if (query.includes('resume') || query.includes('edu') || query.includes('cert') || query.includes('iit')) {
-      const resumeSection = document.getElementById('resume');
-      if (resumeSection) {
-        resumeSection.scrollIntoView({ behavior: 'smooth' });
-        showToast(`Showing certifications & education for "${query}"`);
-      }
-    } else if (query.includes('contact') || query.includes('talk') || query.includes('email') || query.includes('hire')) {
-      const contactSection = document.getElementById('contact');
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      showToast(`Found skills & experience matching "${query}"`);
+    if (cmd === 'resume') {
+      window.open('assets/Sijin_Agasthi_Resume.pdf', '_blank');
     }
+
+    const outputLine = document.createElement('div');
+    outputLine.className = 'term-line';
+
+    if (commands[cmd]) {
+      outputLine.className = 'term-line output-accent';
+      outputLine.style.whiteSpace = 'pre-line';
+      outputLine.textContent = commands[cmd];
+    } else {
+      outputLine.className = 'term-line output-muted';
+      outputLine.textContent = `Command not recognized: "${cmd}". Type 'help' to see valid commands.`;
+    }
+
+    terminalHistory.appendChild(outputLine);
+    if (terminalInput) terminalInput.value = '';
+    const body = document.getElementById('terminal-body');
+    if (body) body.scrollTop = body.scrollHeight;
   }
 
-  if (searchBtn) {
-    searchBtn.addEventListener('click', performSearch);
-  }
-  if (searchInput) {
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') performSearch();
+  if (terminalInput) {
+    terminalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        executeCommand(terminalInput.value);
+      }
     });
   }
 
-  // 6. Direct Contact Form Submission
+  terminalChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const cmd = chip.getAttribute('data-cmd');
+      executeCommand(cmd);
+    });
+  });
+
+  // 12. Contact Form Simulation
   if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -141,13 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 7. Mobile Navigation Toggle
+  // 13. Mobile Navigation Toggle
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener('click', () => {
       navMenu.classList.toggle('mobile-open');
     });
 
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.nav-link').forEach((link) => {
       link.addEventListener('click', () => {
         navMenu.classList.remove('mobile-open');
       });

@@ -4,14 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sijin Agasthi | Software Developer & AI Engineer</title>
-  <meta name="description" content="Portfolio of Sijin Agasthi - Software Developer & AI Engineer specializing in .NET, Machine Learning, and Generative AI.">
+  <meta name="description" content="Portfolio of Sijin Agasthi - Software Developer & AI Engineer specializing in .NET, Machine Learning, Generative AI, and Data Analytics.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2L30 10V22L16 30L2 22V10L16 2Z' fill='%2300E599'/></svg>">
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Devicon Library for Authentic Tech Logos -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <!-- Background Topographic Wave Contours -->
+<body class="loading">
+
+  <!-- Cinematic Preloader -->
+  <div id="preloader" class="preloader">
+    <div class="preloader-content">
+      <div class="preloader-logo">
+        <svg width="48" height="48" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L30 10V22L16 30L2 22V10L16 2Z" stroke="#00E599" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M16 8L24 13V19L16 24L8 19V13L16 8Z" fill="#00E599" fill-opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="preloader-text-wrap">
+        <div class="preloader-bg-text">SIJIN AGASTHI<span class="accent-dot">.</span></div>
+        <div class="preloader-fill-text" id="preloader-fill">SIJIN AGASTHI<span class="accent-dot">.</span></div>
+      </div>
+      <div class="preloader-progress-track">
+        <div class="preloader-progress-bar" id="preloader-bar"></div>
+      </div>
+      <p class="preloader-sub">INITIALIZING INTELLIGENCE INTERFACE...</p>
+    </div>
+  </div>
+
+  <!-- Mouse Spotlight Glow (Desktop) -->
+  <div class="cursor-spotlight" id="cursor-spotlight" aria-hidden="true"></div>
+
+  <!-- Interactive HTML5 Canvas Particle Background -->
+  <canvas id="particle-canvas" class="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Topographic Wave Contours Overlay -->
   <div class="bg-contours" aria-hidden="true">
     <svg viewBox="0 0 1440 900" fill="none" preserveAspectRatio="none">
       <path d="M-100,120 C240,40 450,220 800,100 C1150,-20 1350,180 1600,110" stroke="rgba(0, 229, 153, 0.12)" stroke-width="1.5" />
@@ -27,42 +63,57 @@
     <div class="ambient-glow glow-bottom-right"></div>
   </div>
 
-  <!-- Notification Toast -->
+  <!-- Toast Notification -->
   <div id="toast" class="toast" role="alert" aria-live="polite"></div>
 
-  <!-- Page Wrapper -->
+  <!-- App Wrapper -->
   <div class="app-container">
 
-    <!-- Top Navigation Bar -->
+    <!-- Sticky Navigation Bar -->
     <header class="navbar" id="top-nav">
       <div class="nav-brand">
         <a href="#home" class="brand-link" aria-label="Sijin Agasthi Home">
-          <svg class="brand-logo" width="30" height="30" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2L30 10V22L16 30L2 22V10L16 2Z" stroke="#00E599" stroke-width="2.5" stroke-linejoin="round"/>
-            <path d="M16 8L24 13V19L16 24L8 19V13L16 8Z" fill="#00E599" fill-opacity="0.3" stroke="#00E599" stroke-width="1.5"/>
-          </svg>
-          <span class="brand-text">Portfolio</span>
+          <div class="brand-icon-box">
+            <svg class="brand-logo" width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2L30 10V22L16 30L2 22V10L16 2Z" stroke="#00E599" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M16 8L24 13V19L16 24L8 19V13L16 8Z" fill="#00E599" fill-opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <span class="brand-name">Sijin Agasthi</span>
+            <span class="brand-role">AI & .NET Dev</span>
+          </div>
         </a>
       </div>
 
       <nav class="nav-links" id="nav-menu">
         <a href="#home" class="nav-link active">Home</a>
-        <a href="#services" class="nav-link">What I Do</a>
+        <a href="#expertise" class="nav-link">Expertise</a>
+        <a href="#skills" class="nav-link">Tech Stack</a>
         <a href="#projects" class="nav-link">Projects</a>
         <a href="#experience" class="nav-link">Experience</a>
         <a href="#resume" class="nav-link">Resume</a>
+        <a href="#contact" class="nav-link">Contact</a>
       </nav>
 
       <div class="nav-actions">
-        <!-- Interactive Search Bar -->
-        <div class="search-box">
-          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <!-- Interactive Terminal Trigger Button -->
+        <button type="button" id="terminal-toggle-btn" class="terminal-btn" title="Open Interactive CLI Terminal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
           </svg>
-          <input type="text" id="site-search" placeholder="Search skills, projects..." aria-label="Search portfolio content">
-          <button type="button" id="search-btn" class="search-btn">Search</button>
-        </div>
+          <span>Terminal</span>
+        </button>
+
+        <a href="assets/Sijin_Agasthi_Resume.pdf" target="_blank" download="Sijin_Agasthi_Resume.pdf" class="nav-cv-btn" title="Download Official CV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>CV</span>
+        </a>
 
         <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
           <span></span><span></span><span></span>
@@ -70,31 +121,68 @@
       </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Layout -->
     <main class="main-layout">
-      <!-- Left / Main Column -->
+      <!-- Primary Column -->
       <div class="content-primary">
         
         <!-- Hero Section -->
         <section class="hero-section" id="home">
           <div class="hero-text-block">
-            <div class="greeting-badge">
-              Hello, <span class="highlight-badge">I'm</span>
+            <!-- Pulsing Status Pill -->
+            <div class="status-pill">
+              <span class="pulsing-radar"></span>
+              <span class="status-text">Available for Opportunities • Kannur, Kerala & Remote</span>
             </div>
+
+            <div class="greeting-row">
+              <span class="greeting-prefix">Hello,</span>
+              <span class="greeting-tag">I'm</span>
+            </div>
+
             <h1 class="hero-title">Sijin Agasthi</h1>
-            <h2 class="hero-subtitle">Software Developer & AI Engineer</h2>
+            
+            <!-- Dynamic Typing Subtitle -->
+            <div class="typing-container">
+              <span class="static-subtitle">A Passionate </span>
+              <span class="dynamic-subtitle" id="typewriter-text">Software Developer & AI Engineer</span>
+              <span class="typing-cursor">|</span>
+            </div>
+
             <p class="hero-description">
-              Motivated and detail-oriented B.Tech graduate, Software Developer, and AI Engineer with hands-on experience building <strong>.NET applications</strong>, <strong>machine learning models</strong>, and <strong>generative AI solutions</strong>. Skilled in Python, C#, .NET, Java, and data visualization tools to deliver impactful real-world software.
+              Motivated B.Tech graduate, Software Developer, and AI Engineer with hands-on experience engineering 
+              <strong>high-performance .NET applications</strong>, <strong>machine learning algorithms</strong>, and 
+              <strong>cutting-edge Generative AI solutions</strong>. Skilled in turning complex computational challenges into elegant, robust digital products.
             </p>
 
+            <!-- Metrics / Key Highlights Counter Bar -->
+            <div class="hero-metrics-bar">
+              <div class="metric-card">
+                <span class="metric-number">81.5%</span>
+                <span class="metric-label">ML Model Accuracy (Drowsiness)</span>
+              </div>
+              <div class="metric-divider"></div>
+              <div class="metric-card">
+                <span class="metric-number">2+</span>
+                <span class="metric-label">Flagship AI & IoT Systems</span>
+              </div>
+              <div class="metric-divider"></div>
+              <div class="metric-card">
+                <span class="metric-number">5+</span>
+                <span class="metric-label">Elite Certifications & Workshops</span>
+              </div>
+            </div>
+
+            <!-- Hero Action Buttons -->
             <div class="hero-cta-group">
               <a href="#contact" class="btn-glow-pill" id="lets-talk-btn">
                 <span>Let's Talk</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
               </a>
-              <a href="assets/Sijin_Agasthi_Resume.pdf" target="_blank" download="Sijin_Agasthi_Resume.pdf" class="btn-outline-pill" title="Download Official Resume PDF">
+              <a href="assets/Sijin_Agasthi_Resume.pdf" target="_blank" download="Sijin_Agasthi_Resume.pdf" class="btn-outline-pill">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
@@ -102,27 +190,30 @@
                 </svg>
                 <span>Download CV</span>
               </a>
+              <a href="#projects" class="btn-ghost-pill">Explore Work ↓</a>
             </div>
 
+            <!-- Social Links Row -->
             <div class="hero-social-row">
-              <span class="social-label">Check Out My</span>
+              <span class="social-label">Connect With Me:</span>
               <div class="social-icons">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn" title="LinkedIn Profile">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.64 1.64 0 1 0 0-3.28 1.64 1.64 0 0 0 0 3.28m1.4 9.74v-8.37H5.06v8.37h2.8z"/>
-                  </svg>
+                <a href="https://github.com/sijinagsthi111-netizen" target="_blank" rel="noopener noreferrer" class="social-btn github-btn" title="GitHub: sijinagsthi111-netizen">
+                  <i class="devicon-github-original"></i>
                 </a>
-                <a href="https://github.com/sijinagsthi111-netizen" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub: sijinagsthi111-netizen">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
-                  </svg>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn linkedin-btn" title="LinkedIn Profile">
+                  <i class="devicon-linkedin-plain"></i>
                 </a>
-                <a href="mailto:sijinagsthi111@gmail.com" class="social-btn" title="Email Sijin">
+                <a href="mailto:sijinagsthi111@gmail.com" class="social-btn email-btn" title="Email: sijinagsthi111@gmail.com">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                   </svg>
                 </a>
-                <button type="button" class="social-btn" id="phone-copy-btn" title="Copy Phone: 8593990351">
+                <a href="https://wa.me/918593990351" target="_blank" rel="noopener noreferrer" class="social-btn whatsapp-btn" title="Chat on WhatsApp">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.79 14.15c-.24.67-1.39 1.28-1.92 1.36-.5.08-1.15.11-3.69-.94-3.25-1.35-5.34-4.66-5.5-4.88-.16-.22-1.31-1.74-1.31-3.32s.83-2.36 1.12-2.68c.3-.32.65-.4.87-.4.22 0 .43.01.62.01.2 0 .46-.08.72.54.27.65.92 2.25 1 2.41.08.16.13.35.03.56-.11.22-.16.35-.32.54-.16.19-.34.42-.49.56-.16.16-.33.34-.14.67.19.32.84 1.39 1.81 2.25 1.25 1.11 2.3 1.45 2.63 1.61.33.16.52.14.71-.08.19-.22.82-.95 1.04-1.28.22-.33.44-.27.73-.16.3.11 1.87.88 2.19 1.04.32.16.54.24.62.38.08.14.08.82-.16 1.49z"/>
+                  </svg>
+                </a>
+                <button type="button" class="social-btn phone-btn" id="phone-copy-btn" title="Copy Phone (+91 8593990351)">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                   </svg>
@@ -131,193 +222,338 @@
             </div>
           </div>
 
-          <!-- Hexagon Portrait Frame with Glowing Emerald Aura -->
+          <!-- Hexagon 3D Tilt Portrait Card -->
           <div class="hero-visual">
-            <div class="hexagon-wrapper">
-              <div class="hexagon-glow"></div>
-              <div class="hexagon-border">
-                <div class="hexagon-inner">
-                  <img src="assets/profile.jpg" alt="Sijin Agasthi portrait" id="profile-img" class="portrait-photo">
+            <div class="tilt-card-container" id="profile-tilt-card">
+              <div class="hexagon-wrapper">
+                <div class="hexagon-glow"></div>
+                <div class="hexagon-border">
+                  <div class="hexagon-inner">
+                    <img src="assets/profile.jpg" alt="Sijin Agasthi portrait" id="profile-img" class="portrait-photo">
+                  </div>
                 </div>
+              </div>
+
+              <!-- Floating Tech Badges around Hexagon -->
+              <div class="floating-badge badge-top-left" data-speed="1.2">
+                <i class="devicon-python-plain colored"></i>
+                <span>Python AI</span>
+              </div>
+              <div class="floating-badge badge-top-right" data-speed="0.8">
+                <i class="devicon-dotnetcore-plain colored"></i>
+                <span>.NET Core</span>
+              </div>
+              <div class="floating-badge badge-bottom-left" data-speed="1.4">
+                <i class="devicon-csharp-plain colored"></i>
+                <span>C# Dev</span>
+              </div>
+              <div class="floating-badge badge-bottom-right" data-speed="1.0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                  <path d="M2 12h20"></path>
+                </svg>
+                <span>Vision ML</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Services Section: What I Do -->
-        <section class="services-section" id="services">
+        <!-- Expertise / What I Do Section -->
+        <section class="services-section" id="expertise">
           <div class="section-header">
-            <span class="section-tag">My services</span>
-            <h2 class="section-title">What I Do</h2>
+            <span class="section-tag">Core Competencies</span>
+            <h2 class="section-title">Engineering Expertise</h2>
+            <p class="section-description">Building scalable architectures with clean code, machine intelligence, and verified quality standards.</p>
           </div>
 
           <div class="services-grid">
-            <!-- Service Card 1 -->
-            <div class="service-card">
+            <!-- Expertise 1 -->
+            <div class="service-card tilt-item" data-tilt>
+              <div class="card-glow-overlay"></div>
               <div class="card-icon-wrap">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
                   <path d="M12 2a4 4 0 0 1 4 4c0 1.1-.5 2.1-1.3 2.8.5.6.8 1.4.8 2.2 0 .9-.4 1.7-1 2.3.6.5 1 1.3 1 2.2 0 1.6-1.3 3-3 3s-3-1.4-3-3c0-.9.4-1.7 1-2.2-.6-.6-1-1.4-1-2.3 0-.8.3-1.6.8-2.2C9.5 8.1 9 7.1 9 6a4 4 0 0 1 3-4z"/>
                   <path d="M9 12h6M8 8h8M9 16h6"/>
                 </svg>
               </div>
-              <h3 class="service-name">AI & Machine Learning</h3>
+              <h3 class="service-name">Artificial Intelligence & ML</h3>
               <p class="service-desc">
-                Engineering cutting-edge Generative AI solutions, multimodal LLM pipelines, object detection models, and predictive analytics tailored for real-world deployment.
+                Designing multimodal LLM prompt workflows, computer vision object-detection pipelines, and predictive algorithms (LSTM, KNN) tailored for production systems.
               </p>
               <div class="skill-chips">
-                <span>GenAI</span>
-                <span>LLMs</span>
-                <span>PyTorch</span>
-                <span>OpenCV</span>
+                <span><i class="devicon-python-plain colored"></i> Python</span>
+                <span>Generative AI</span>
+                <span>PyTorch / ML</span>
+                <span>Computer Vision</span>
               </div>
             </div>
 
-            <!-- Service Card 2 -->
-            <div class="service-card highlight-card">
+            <!-- Expertise 2 -->
+            <div class="service-card highlight-card tilt-item" data-tilt>
+              <div class="card-glow-overlay"></div>
               <div class="card-icon-wrap">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
                   <polyline points="16 18 22 12 16 6"></polyline>
                   <polyline points="8 6 2 12 8 18"></polyline>
                   <line x1="14" y1="4" x2="10" y2="20"></line>
                 </svg>
               </div>
-              <h3 class="service-name">.NET Development</h3>
+              <h3 class="service-name">.NET & Backend Architecture</h3>
               <p class="service-desc">
-                Architecting robust, secure, and maintainable software applications utilizing C#, .NET, ASP.NET, and enterprise-grade software design patterns.
+                Engineering high-throughput, maintainable software and enterprise microservices using modern C#, .NET Core, ASP.NET Web APIs, and clean software architecture.
               </p>
               <div class="skill-chips">
-                <span>.NET Core</span>
-                <span>C#</span>
+                <span><i class="devicon-csharp-plain colored"></i> C#</span>
+                <span><i class="devicon-dotnetcore-plain colored"></i> .NET Core</span>
                 <span>ASP.NET</span>
                 <span>REST APIs</span>
               </div>
             </div>
 
-            <!-- Service Card 3 -->
-            <div class="service-card">
+            <!-- Expertise 3 -->
+            <div class="service-card tilt-item" data-tilt>
+              <div class="card-glow-overlay"></div>
               <div class="card-icon-wrap">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.8">
                   <line x1="18" y1="20" x2="18" y2="10"></line>
                   <line x1="12" y1="20" x2="12" y2="4"></line>
                   <line x1="6" y1="20" x2="6" y2="14"></line>
                   <line x1="2" y1="20" x2="22" y2="20"></line>
                 </svg>
               </div>
-              <h3 class="service-name">Data Analytics & Vision</h3>
+              <h3 class="service-name">Data Analytics & Visualization</h3>
               <p class="service-desc">
-                Transforming raw operational data into actionable insights through Power BI modeling, Matplotlib, R statistical analysis, and interactive business dashboards.
+                Converting enterprise datasets into actionable executive intelligence with Power BI modeling, DAX queries, Matplotlib visualizations, and statistical modeling in R.
               </p>
               <div class="skill-chips">
                 <span>Power BI</span>
+                <span>Power Query</span>
                 <span>Matplotlib</span>
-                <span>R</span>
-                <span>Data Modeling</span>
+                <span><i class="devicon-r-plain colored"></i> R Lang</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Technical Skills Badges -->
-        <section class="skills-strip" id="skills">
-          <div class="strip-header">
-            <h3>Technical Toolkit & Domains</h3>
+        <!-- Technical Toolkit / Skills Matrix with Official Devicons -->
+        <section class="skills-section" id="skills">
+          <div class="section-header">
+            <span class="section-tag">Interactive Tech Stack</span>
+            <h2 class="section-title">Technologies & Tools</h2>
+            <p class="section-description">A multi-disciplinary stack across languages, deep learning, enterprise software, and cloud analytics.</p>
           </div>
-          <div class="skills-flex-list">
-            <span class="tool-tag"><i class="dot"></i> Python</span>
-            <span class="tool-tag"><i class="dot"></i> C#</span>
-            <span class="tool-tag"><i class="dot"></i> .NET & ASP.NET</span>
-            <span class="tool-tag"><i class="dot"></i> Java</span>
-            <span class="tool-tag"><i class="dot"></i> C / C++</span>
-            <span class="tool-tag"><i class="dot"></i> Generative AI & LLMs</span>
-            <span class="tool-tag"><i class="dot"></i> Machine Learning</span>
-            <span class="tool-tag"><i class="dot"></i> Power BI & Power Query</span>
-            <span class="tool-tag"><i class="dot"></i> Matplotlib</span>
-            <span class="tool-tag"><i class="dot"></i> R Programming</span>
-            <span class="tool-tag"><i class="dot"></i> Software QA & Testing</span>
-            <span class="tool-tag"><i class="dot"></i> Raspberry Pi & IoT</span>
+
+          <!-- Skills Filter Tabs -->
+          <div class="skills-tab-bar">
+            <button class="skill-tab active" data-filter="all">All Tools</button>
+            <button class="skill-tab" data-filter="languages">Languages</button>
+            <button class="skill-tab" data-filter="ai">AI & ML</button>
+            <button class="skill-tab" data-filter="backend">Backend & Frameworks</button>
+            <button class="skill-tab" data-filter="data">Data & Tools</button>
+          </div>
+
+          <div class="skills-showcase-grid" id="skills-grid">
+            <!-- Python -->
+            <div class="tech-badge-card" data-category="languages ai">
+              <i class="devicon-python-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">Python</span>
+                <span class="tech-level">AI & Analytics</span>
+              </div>
+            </div>
+
+            <!-- C# -->
+            <div class="tech-badge-card" data-category="languages backend">
+              <i class="devicon-csharp-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">C#</span>
+                <span class="tech-level">Enterprise Dev</span>
+              </div>
+            </div>
+
+            <!-- .NET Core -->
+            <div class="tech-badge-card" data-category="backend">
+              <i class="devicon-dotnetcore-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">.NET / ASP.NET</span>
+                <span class="tech-level">Framework</span>
+              </div>
+            </div>
+
+            <!-- Java -->
+            <div class="tech-badge-card" data-category="languages">
+              <i class="devicon-java-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">Java</span>
+                <span class="tech-level">Core OOP</span>
+              </div>
+            </div>
+
+            <!-- C / C++ -->
+            <div class="tech-badge-card" data-category="languages">
+              <i class="devicon-cplusplus-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">C / C++</span>
+                <span class="tech-level">System & Logic</span>
+              </div>
+            </div>
+
+            <!-- Generative AI -->
+            <div class="tech-badge-card" data-category="ai">
+              <span class="custom-badge-icon">🧠</span>
+              <div class="tech-details">
+                <span class="tech-title">Generative AI</span>
+                <span class="tech-level">LLMs & Multimodal</span>
+              </div>
+            </div>
+
+            <!-- Machine Learning -->
+            <div class="tech-badge-card" data-category="ai">
+              <span class="custom-badge-icon">⚡</span>
+              <div class="tech-details">
+                <span class="tech-title">Machine Learning</span>
+                <span class="tech-level">LSTM, KNN, EAR</span>
+              </div>
+            </div>
+
+            <!-- Power BI -->
+            <div class="tech-badge-card" data-category="data">
+              <span class="custom-badge-icon">📊</span>
+              <div class="tech-details">
+                <span class="tech-title">Power BI</span>
+                <span class="tech-level">Data Modeling & DAX</span>
+              </div>
+            </div>
+
+            <!-- Matplotlib -->
+            <div class="tech-badge-card" data-category="data ai">
+              <i class="devicon-matplotlib-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">Matplotlib</span>
+                <span class="tech-level">Visual Analytics</span>
+              </div>
+            </div>
+
+            <!-- R Programming -->
+            <div class="tech-badge-card" data-category="languages data">
+              <i class="devicon-r-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">R Programming</span>
+                <span class="tech-level">Statistical Modeling</span>
+              </div>
+            </div>
+
+            <!-- Git & GitHub -->
+            <div class="tech-badge-card" data-category="data backend">
+              <i class="devicon-git-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">Git & GitHub</span>
+                <span class="tech-level">Version Control</span>
+              </div>
+            </div>
+
+            <!-- Raspberry Pi -->
+            <div class="tech-badge-card" data-category="ai backend">
+              <i class="devicon-raspberrypi-plain colored tech-icon"></i>
+              <div class="tech-details">
+                <span class="tech-title">Raspberry Pi</span>
+                <span class="tech-level">Edge AI & IoT</span>
+              </div>
+            </div>
           </div>
         </section>
 
       </div>
 
-      <!-- Right Column: Projects, Testimonials, Experience -->
+      <!-- Secondary Column -->
       <aside class="content-secondary">
         
-        <!-- Recent Projects Section -->
+        <!-- Interactive Projects Section -->
         <section class="projects-section" id="projects">
           <div class="section-header-compact">
             <div>
-              <h2 class="section-title-sm">Recent <span class="accent-text">Projects</span></h2>
-              <p class="section-subtext">Featured AI & Machine Learning Engineering implementations</p>
+              <span class="section-tag">Featured Work</span>
+              <h2 class="section-title-sm">Engineering <span class="accent-text">Projects</span></h2>
             </div>
             <div class="carousel-nav-arrows">
               <button class="arrow-btn" id="prev-project-btn" aria-label="Previous project">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
               </button>
               <button class="arrow-btn" id="next-project-btn" aria-label="Next project">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
               </button>
             </div>
           </div>
 
-          <!-- Project Cards Container -->
           <div class="projects-deck" id="projects-deck">
-            <!-- Project 1 -->
-            <article class="project-card active" data-index="0">
+            <!-- Project 1: VisionAid -->
+            <article class="project-card active tilt-item" data-index="0" data-tilt>
               <div class="project-banner project-visionaid">
-                <div class="project-badge">Featured AI Project</div>
-                <div class="project-mockup-graphic">
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.5">
-                    <circle cx="12" cy="12" r="9"/>
-                    <circle cx="12" cy="12" r="3" fill="#00E599" fill-opacity="0.3"/>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  </svg>
+                <div class="project-badge">Generative AI • IoT</div>
+                <div class="project-status-dot">
+                  <span class="pulse-emerald"></span> Active
                 </div>
               </div>
               <div class="project-body">
-                <h3 class="project-title">VisionAid: Personalized Voice Assistant</h3>
+                <div class="project-title-row">
+                  <h3 class="project-title">VisionAid: Personalized Voice Assistant</h3>
+                  <a href="https://github.com/sijinagsthi111-netizen/portfolio" target="_blank" class="proj-ext-link" title="View Source on GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
                 <p class="project-summary">
-                  Smart assistive glasses system built using Raspberry Pi and a camera to deliver real-time voice guidance for visually impaired users.
+                  A smart wearable assistive glasses ecosystem engineered with Raspberry Pi and camera to deliver real-time environmental audio guidance for visually impaired individuals.
                 </p>
+                <div class="project-key-stats">
+                  <span class="pill-stat">🎙️ Real-Time Scene-to-Speech</span>
+                  <span class="pill-stat">⚡ Multimodal LLM</span>
+                </div>
                 <ul class="project-bullets">
-                  <li>Applied generative AI for multi-modal processing, enabling real-time object detection and scene-to-text conversion from live feed.</li>
-                  <li>Integrated a lightweight database to send enriched prompts to an LLM, generating natural personalized voice responses.</li>
+                  <li>Integrated live video feed processing with GenAI for zero-latency object detection and scene description.</li>
+                  <li>Architected a lightweight database to send contextual prompt enrichment to an LLM, streaming natural synthesized voice feedback.</li>
                 </ul>
                 <div class="project-tech-tags">
                   <span>Raspberry Pi</span>
-                  <span>Generative AI</span>
-                  <span>Multimodal LLM</span>
-                  <span>Text-to-Speech</span>
+                  <span>GenAI</span>
+                  <span>Multimodal LLMs</span>
+                  <span>TTS</span>
+                  <span>Python</span>
                 </div>
               </div>
             </article>
 
-            <!-- Project 2 -->
-            <article class="project-card" data-index="1">
+            <!-- Project 2: Driver Drowsiness -->
+            <article class="project-card tilt-item" data-index="1" data-tilt>
               <div class="project-banner project-drowsiness">
-                <div class="project-badge">Computer Vision & ML</div>
-                <div class="project-mockup-graphic">
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="1.5">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M12 9v3l2 2" stroke-linecap="round"/>
-                  </svg>
+                <div class="project-badge">Computer Vision • Safety</div>
+                <div class="project-status-dot">
+                  <span class="pulse-emerald"></span> 81.5% Accuracy
                 </div>
               </div>
               <div class="project-body">
-                <h3 class="project-title">Driver Drowsiness Monitoring & Detection</h3>
+                <div class="project-title-row">
+                  <h3 class="project-title">Driver Drowsiness Monitoring & Detection</h3>
+                  <a href="https://github.com/sijinagsthi111-netizen/portfolio" target="_blank" class="proj-ext-link" title="View Source on GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
                 <p class="project-summary">
-                  Real-time automotive safety system using machine learning and facial landmark tracking to identify driver fatigue and prevent accidents.
+                  Real-time automotive safety intelligence tracking facial landmarks and micro eye closures to detect drowsiness and prevent vehicular accidents.
                 </p>
+                <div class="project-key-stats">
+                  <span class="pill-stat">👁️ Eye Aspect Ratio (EAR)</span>
+                  <span class="pill-stat">🚨 Acoustic Safety Alarm</span>
+                </div>
                 <ul class="project-bullets">
-                  <li>Developed using LSTM-KNN for face detection and Eye Aspect Ratio (EAR) analysis to identify micro eye closure events.</li>
-                  <li>Implemented real-time acoustic alarm-trigger upon fatigue detection; validated at <strong>81.5% detection accuracy</strong>.</li>
+                  <li>Engineered using hybrid LSTM-KNN models for facial landmark tracking and EAR calculus to identify micro-sleep events.</li>
+                  <li>Integrated automated fail-safe trigger alarms for fatigue warning; verified at <strong>81.5% empirical detection accuracy</strong>.</li>
                 </ul>
                 <div class="project-tech-tags">
                   <span>Machine Learning</span>
                   <span>LSTM-KNN</span>
-                  <span>Eye Aspect Ratio (EAR)</span>
-                  <span>Safety Alarm</span>
+                  <span>OpenCV</span>
+                  <span>EAR Calculus</span>
                 </div>
               </div>
             </article>
@@ -329,11 +565,11 @@
           </div>
         </section>
 
-        <!-- Experience & Background -->
+        <!-- Professional Experience Timeline -->
         <section class="experience-section" id="experience">
           <div class="section-header-compact">
             <div>
-              <span class="section-tag">Career & Roles</span>
+              <span class="section-tag">Career History</span>
               <h2 class="section-title-sm">Work Experience</h2>
             </div>
           </div>
@@ -349,7 +585,7 @@
                 </div>
                 <p class="company-name">Distinct Infotech Solutions</p>
                 <p class="role-desc">
-                  Building enterprise applications using .NET while contributing to the design, architectural development, and deployment of intelligent AI-driven solutions.
+                  Building enterprise web applications utilizing .NET while contributing to the architectural design, algorithmic development, and production deployment of intelligent AI-driven business solutions.
                 </p>
               </div>
             </div>
@@ -364,23 +600,23 @@
                 </div>
                 <p class="company-name">AI Fire Lab</p>
                 <p class="role-desc">
-                  Performed comprehensive software testing to identify edge-case defects, verify product functionality, and ensure quality standards prior to release.
+                  Conducted end-to-end functionality testing, regression suites, edge-case vulnerability assessments, and performance verification to guarantee enterprise quality standards prior to deployment.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Education & Certifications -->
+        <!-- Education & Resume Hub -->
         <section class="certifications-section" id="resume">
           <div class="section-header-compact">
             <div>
-              <span class="section-tag">Credentials</span>
-              <h2 class="section-title-sm">Education & Certifications</h2>
+              <span class="section-tag">Verified Qualifications</span>
+              <h2 class="section-title-sm">Resume & Education</h2>
             </div>
           </div>
 
-          <!-- Official Resume Document Card -->
+          <!-- Official Resume Document Card with Dual Actions -->
           <div class="resume-download-card">
             <div class="resume-icon-box">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00E599" stroke-width="2">
@@ -392,11 +628,11 @@
               </svg>
             </div>
             <div class="resume-info">
-              <h4>Sijin Agasthi — Resume</h4>
-              <p>Official PDF Document • Software Developer & AI Engineer</p>
+              <h4>Sijin Agasthi — Curriculum Vitae</h4>
+              <p>Official PDF Document • 1 Page Complete</p>
             </div>
             <div class="resume-action-buttons">
-              <a href="assets/Sijin_Agasthi_Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn-resume-view" title="Open and view PDF in new tab">
+              <a href="assets/Sijin_Agasthi_Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn-resume-view" title="Open PDF in new tab">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
@@ -414,6 +650,7 @@
             </div>
           </div>
 
+          <!-- Academic Degree -->
           <div class="cred-card">
             <div class="cred-icon">🎓</div>
             <div class="cred-details">
@@ -422,6 +659,7 @@
             </div>
           </div>
 
+          <!-- Certifications Grid -->
           <div class="cert-grid">
             <div class="cert-item">
               <div class="cert-bullet"></div>
@@ -461,12 +699,12 @@
           </div>
         </section>
 
-        <!-- Testimonials / Client Quotes Section -->
+        <!-- Testimonials Section -->
         <section class="testimonials-section">
           <div class="section-header-compact">
             <div>
-              <span class="section-tag">Testimonials</span>
-              <h2 class="section-title-sm">What Colleagues & Clients Say</h2>
+              <span class="section-tag">Endorsements</span>
+              <h2 class="section-title-sm">Professional Feedback</h2>
             </div>
           </div>
 
@@ -479,23 +717,27 @@
               <div class="client-avatar">AI</div>
               <div>
                 <strong>AI Systems Lead</strong>
-                <p>Collaborator & Mentor</p>
+                <p>Collaborator & Technical Mentor</p>
               </div>
             </div>
           </div>
         </section>
 
-      </div>
+      </aside>
     </main>
 
-    <!-- Contact & Let's Talk Section -->
+    <!-- Interactive Contact / Let's Talk Section -->
     <section class="contact-section" id="contact">
       <div class="contact-card-box">
         <div class="contact-info-col">
-          <span class="section-tag">Get in Touch</span>
-          <h2 class="section-title">Let's Build Something Extraordinary</h2>
+          <div class="status-pill inline-status">
+            <span class="pulsing-radar"></span>
+            <span class="status-text">Ready for Immediate Hire / Contract</span>
+          </div>
+
+          <h2 class="section-title">Let's Build Something Extraordinary Together</h2>
           <p class="contact-lead">
-            Whether you have an AI/ML initiative, a scalable .NET enterprise application, or a challenging problem to solve, I am ready to collaborate.
+            Whether you have an ambitious AI/ML initiative, a scalable .NET enterprise application, or an engineering role, I am ready to collaborate and deliver value.
           </p>
 
           <div class="contact-items">
@@ -503,39 +745,52 @@
               <div class="contact-icon">📍</div>
               <div>
                 <strong>Location</strong>
-                <p>Kannur, Kerala, India</p>
+                <p>Kannur, Kerala, India (Open to Remote)</p>
               </div>
             </div>
             <div class="contact-item">
               <div class="contact-icon">✉️</div>
               <div>
-                <strong>Email</strong>
+                <strong>Direct Email</strong>
                 <p><a href="mailto:sijinagsthi111@gmail.com">sijinagsthi111@gmail.com</a></p>
               </div>
             </div>
             <div class="contact-item">
               <div class="contact-icon">📞</div>
               <div>
-                <strong>Phone</strong>
+                <strong>Phone & WhatsApp</strong>
                 <p><a href="tel:8593990351">+91 8593990351</a></p>
               </div>
             </div>
+          </div>
+
+          <div class="quick-chat-row">
+            <a href="https://wa.me/918593990351" target="_blank" rel="noopener noreferrer" class="btn-whatsapp-chat">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.79 14.15c-.24.67-1.39 1.28-1.92 1.36-.5.08-1.15.11-3.69-.94-3.25-1.35-5.34-4.66-5.5-4.88-.16-.22-1.31-1.74-1.31-3.32s.83-2.36 1.12-2.68c.3-.32.65-.4.87-.4.22 0 .43.01.62.01.2 0 .46-.08.72.54.27.65.92 2.25 1 2.41.08.16.13.35.03.56-.11.22-.16.35-.32.54-.16.19-.34.42-.49.56-.16.16-.33.34-.14.67.19.32.84 1.39 1.81 2.25 1.25 1.11 2.3 1.45 2.63 1.61.33.16.52.14.71-.08.19-.22.82-.95 1.04-1.28.22-.33.44-.27.73-.16.3.11 1.87.88 2.19 1.04.32.16.54.24.62.38.08.14.08.82-.16 1.49z"/>
+              </svg>
+              <span>Instant WhatsApp Message</span>
+            </a>
           </div>
         </div>
 
         <div class="contact-form-col">
           <form id="contact-form" class="direct-contact-form">
             <div class="form-group">
-              <label for="sender-name">Your Name</label>
-              <input type="text" id="sender-name" placeholder="John Doe" required>
+              <label for="sender-name">Your Full Name</label>
+              <input type="text" id="sender-name" placeholder="Alex Morgan" required>
             </div>
             <div class="form-group">
-              <label for="sender-email">Your Email</label>
-              <input type="email" id="sender-email" placeholder="john@example.com" required>
+              <label for="sender-email">Your Work Email</label>
+              <input type="email" id="sender-email" placeholder="alex@company.com" required>
+            </div>
+            <div class="form-group">
+              <label for="sender-subject">Subject / Project Type</label>
+              <input type="text" id="sender-subject" placeholder="Opportunity / AI Project Collaboration">
             </div>
             <div class="form-group">
               <label for="sender-msg">Message</label>
-              <textarea id="sender-msg" rows="4" placeholder="Hi Sijin, I'd like to discuss an opportunity..." required></textarea>
+              <textarea id="sender-msg" rows="4" placeholder="Hello Sijin, I came across your portfolio and would like to connect regarding..." required></textarea>
             </div>
             <button type="submit" class="btn-glow-pill w-full">
               <span>Send Message</span>
@@ -555,16 +810,18 @@
         <div class="footer-brand">
           <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
             <path d="M16 2L30 10V22L16 30L2 22V10L16 2Z" stroke="#00E599" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M16 8L24 13V19L16 24L8 19V13L16 8Z" fill="#00E599" fill-opacity="0.3"/>
+            <path d="M16 8L24 13V19L16 24L8 19V13L16 8Z" fill="#00E599" fill-opacity="0.4"/>
           </svg>
           <strong>Sijin Agasthi</strong>
           <span class="footer-sub">Software Developer & AI Engineer</span>
         </div>
         <div class="footer-links">
           <a href="#home">Home</a>
-          <a href="#services">Services</a>
+          <a href="#expertise">Expertise</a>
+          <a href="#skills">Tech Stack</a>
           <a href="#projects">Projects</a>
           <a href="#experience">Experience</a>
+          <a href="#resume">Resume</a>
           <a href="#contact">Contact</a>
         </div>
         <a href="#home" class="back-to-top" aria-label="Back to top">
@@ -574,7 +831,7 @@
         </a>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 Sijin Agasthi. Built with precision and modern AI-driven design.</p>
+        <p>&copy; 2026 Sijin Agasthi. Engineered with precision, modern AI design, and performant web standards.</p>
         <div class="footer-contact-snippets">
           <span>Kannur, Kerala</span> • 
           <a href="mailto:sijinagsthi111@gmail.com">sijinagsthi111@gmail.com</a> • 
@@ -584,6 +841,39 @@
       </div>
     </footer>
 
+  </div>
+
+  <!-- Interactive Hacker Terminal Modal / Drawer -->
+  <div id="terminal-modal" class="terminal-modal" aria-hidden="true">
+    <div class="terminal-dialog">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot-red" id="terminal-close-btn"></span>
+          <span class="dot-yellow"></span>
+          <span class="dot-green"></span>
+        </div>
+        <div class="terminal-title">sijin@ai-core:~ (Interactive Shell)</div>
+        <button class="terminal-exit-icon" id="terminal-exit-icon" aria-label="Close Terminal">&times;</button>
+      </div>
+
+      <div class="terminal-body" id="terminal-body">
+        <div class="term-line output-accent">=== SIJIN AGASTHI INTERACTIVE TERMINAL v2.5 ===</div>
+        <div class="term-line output-muted">Type a command or click the shortcuts below:</div>
+        <div class="term-chips">
+          <button class="term-chip" data-cmd="whoami">whoami</button>
+          <button class="term-chip" data-cmd="skills">skills</button>
+          <button class="term-chip" data-cmd="projects">projects</button>
+          <button class="term-chip" data-cmd="resume">resume</button>
+          <button class="term-chip" data-cmd="contact">contact</button>
+          <button class="term-chip" data-cmd="clear">clear</button>
+        </div>
+        <div id="terminal-history"></div>
+        <div class="term-input-row">
+          <span class="term-prompt">sijin@dev:~$</span>
+          <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="type 'help'...">
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
