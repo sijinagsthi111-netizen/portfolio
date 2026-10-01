@@ -305,6 +305,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Mobile Touch Swipe on Projects Deck
+  const projectsDeck = document.getElementById('projects-deck');
+  if (projectsDeck) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    projectsDeck.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    projectsDeck.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 45) {
+        if (diff > 0) {
+          setProject(currentProjectIndex + 1);
+        } else {
+          setProject(currentProjectIndex - 1);
+        }
+      }
+    }, { passive: true });
+  }
+
   // 10. Copy Phone / Direct Email
   if (phoneCopyBtn) {
     phoneCopyBtn.addEventListener('click', () => {
@@ -421,73 +444,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 13. Mobile Navigation Toggle
+  // 13. Mobile Navigation Toggle & Outside-Click Close
   if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('mobile-open');
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navMenu.classList.toggle('mobile-open');
+      mobileToggle.classList.toggle('active', isOpen);
+      mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
     document.querySelectorAll('.nav-link').forEach((link) => {
       link.addEventListener('click', () => {
         navMenu.classList.remove('mobile-open');
+        mobileToggle.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
       });
     });
-  }
 
-  // 14. Interactive Theme Palette Switcher
-  const themeMenuBtn = document.getElementById('theme-menu-btn');
-  const themeMenuPopover = document.getElementById('theme-menu-popover');
-  const themeOptions = document.querySelectorAll('.theme-option');
-
-  function setTheme(themeName) {
-    document.documentElement.setAttribute('data-theme', themeName);
-    themeOptions.forEach((opt) => {
-      if (opt.getAttribute('data-theme') === themeName) {
-        opt.classList.add('active');
-      } else {
-        opt.classList.remove('active');
-      }
-    });
-    try {
-      localStorage.setItem('sijin_portfolio_theme', themeName);
-    } catch (e) {
-      // LocalStorage access might be restricted in some sandboxes
-    }
-  }
-
-  // Initialize theme from storage or default to 'aurora'
-  let savedTheme = 'aurora';
-  try {
-    savedTheme = localStorage.getItem('sijin_portfolio_theme') || 'aurora';
-  } catch (e) {}
-  setTheme(savedTheme);
-
-  if (themeMenuBtn && themeMenuPopover) {
-    themeMenuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = themeMenuPopover.classList.toggle('open');
-      themeMenuBtn.setAttribute('aria-expanded', isOpen);
-    });
-
+    // Close when tapping anywhere outside the nav on mobile
     document.addEventListener('click', (e) => {
-      if (!themeMenuPopover.contains(e.target) && !themeMenuBtn.contains(e.target)) {
-        themeMenuPopover.classList.remove('open');
-        themeMenuBtn.setAttribute('aria-expanded', 'false');
+      if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+        if (navMenu.classList.contains('mobile-open')) {
+          navMenu.classList.remove('mobile-open');
+          mobileToggle.classList.remove('active');
+          mobileToggle.setAttribute('aria-expanded', 'false');
+        }
       }
     });
   }
 
-  themeOptions.forEach((opt) => {
-    opt.addEventListener('click', () => {
-      const selectedTheme = opt.getAttribute('data-theme');
-      const themeLabel = opt.querySelector('span:last-child')?.textContent || selectedTheme;
-      setTheme(selectedTheme);
-      if (themeMenuPopover) {
-        themeMenuPopover.classList.remove('open');
-        if (themeMenuBtn) themeMenuBtn.setAttribute('aria-expanded', 'false');
-      }
-      showToast(`Switched theme to ${themeLabel} ✨`);
-    });
-  });
+  // 14. Permanent Ultra-Attractive Aurora Prism Theme
+  document.documentElement.setAttribute('data-theme', 'aurora');
 });
 
