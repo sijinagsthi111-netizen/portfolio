@@ -1,52 +1,68 @@
-# Sijin Agasthi - Modern Developer & AI Engineer Portfolio
+# Sijin Agasthi — Personal Developer & AI Engineer Portfolio
 
-A modern, high-performance personal portfolio website built with a luxury dark cyberpunk/glassmorphism theme, topographic contour accents, vibrant emerald glow effects, and interactive showcases.
+[![Live Portfolio Website](https://img.shields.io/badge/Live%20Demo-Open%20Portfolio-00E599?style=for-the-badge&logo=googlechrome&logoColor=black)](https://sijinagsthi111-netizen.github.io/portfolio/)
+[![GitHub](https://img.shields.io/badge/GitHub-sijinagsthi111--netizen-181717?style=for-the-badge&logo=github)](https://github.com/sijinagsthi111-netizen)
 
-![Portfolio Mockup Preview](assets/portfolio_mockup.jpg)
+A modern, high-performance personal portfolio website built with a luxury dark cyberpunk aesthetic, flowing topographic contours, vibrant glowing emerald accents, and interactive showcases.
+
+![Sijin Agasthi Portfolio Mockup](assets/portfolio_mockup.jpg)
 
 ---
 
-## 🌟 Highlights & Features
+## 🌐 Live Webpage on GitHub Pages
 
-- **Design Aesthetic**: Matches the high-end dark slate & emerald neon UI mockup (`#0a0d14` + `#00E599`).
-- **Signature Hexagon Portrait**: Glowing emerald backdrop and hexagonal mask showcasing your profile headshot.
-- **Instant Photo Customizer**: Click the **"Change Photo"** badge or header button in the browser to instantly upload and preview your own real photo live! Your chosen photo is automatically remembered in your browser.
+When hosted on GitHub, this site is published via **GitHub Pages** so that clicking the link opens the live interactive website:
+
+👉 **[https://sijinagsthi111-netizen.github.io/portfolio/](https://sijinagsthi111-netizen.github.io/portfolio/)**
+
+---
+
+## 🚀 How to Add This to Your GitHub (`sijinagsthi111-netizen`)
+
+Follow these simple steps to push this portfolio to your GitHub account:
+
+### Step 1: Create a New Repository on GitHub
+1. Open [github.com/new](https://github.com/new) in your browser.
+2. Set **Repository name**: `portfolio`
+3. Choose **Public**.
+4. **Do NOT** check "Add a README file" (we already created a complete one).
+5. Click **Create repository**.
+
+### Step 2: Push Your Code from Terminal
+Open PowerShell or your terminal in this folder and run:
+
+```bash
+# Link to your new GitHub repository
+git remote add origin https://github.com/sijinagsthi111-netizen/portfolio.git
+
+# Push the portfolio to GitHub
+git push -u origin main
+```
+
+*(If prompted to authenticate, log into your GitHub account or use a Personal Access Token).*
+
+### Step 3: Enable GitHub Pages (To Open as a Live Webpage)
+1. Go to your repository on GitHub: `https://github.com/sijinagsthi111-netizen/portfolio`
+2. Click **Settings** (top tab) → **Pages** (left sidebar).
+3. Under **Build and deployment** > **Source**:
+   - Select **GitHub Actions** (the automated `.github/workflows/deploy.yml` workflow will automatically build and publish it live!).
+   - Alternatively, select **Deploy from a branch** → choose branch `main` → folder `/(root)` → click **Save**.
+4. Within 1-2 minutes, GitHub will publish your live website at:
+   **`https://sijinagsthi111-netizen.github.io/portfolio/`**
+5. On your main repository page, click the ⚙️ icon next to **About** on the right side, check **Use your GitHub Pages website**, and paste your link so visitors can click it directly from your repo!
+
+---
+
+## 🌟 Highlights & Tech Stack
+
+- **Design Aesthetic**: Modern dark obsidian (`#0a0d14`) + vibrant neon emerald (`#00E599`) with subtle topographic contour waves.
+- **Signature Hexagon Portrait**: Clean subject isolation against the glowing emerald polygon mask.
 - **Resume Content Integrated**:
-  - **Hero Section**: Sijin Agasthi, Software Developer & AI Engineer, core value proposition.
-  - **"What I Do" (Services)**: AI & Machine Learning, .NET Development, Data Analytics & Vision.
-  - **Interactive Project Showcase**:
+  - **Hero**: Sijin Agasthi — Software Developer & AI Engineer.
+  - **What I Do**: AI & Machine Learning, .NET Development, Data Analytics & Vision.
+  - **Recent Projects**:
     - *VisionAid: Personalized Voice Assistant for the Visually Impaired* (Raspberry Pi, Multimodal Generative AI, LLMs).
-    - *Driver Drowsiness Monitoring & Detection* (LSTM-KNN, Eye Aspect Ratio, Alarm Mechanism - 81.5% accuracy).
-  - **Experience & Education**: Distinct Infotech Solutions, AI Fire Lab, B.Tech from Vimal Jyothi Engineering College.
-  - **Certifications**: IIT Madras (Python for Data Science), White Track Technologies (Power BI), CUSAT (Robotics), IIT Delhi (Cyber Security).
-  - **Contact & Connect**: Direct links to Kannur, Kerala location, email (`sijinagsthi111@gmail.com`), and phone (`+91 8593990351`) with one-click clipboard copy.
-
----
-
-## 🚀 How to Run Locally
-
-You can open the portfolio directly in any modern browser:
-
-1. Double click [`index.html`](index.html) to open in Chrome, Edge, or Brave.
-2. Alternatively, run a lightweight local server:
-   ```bash
-   npx serve .
-   # or with Python:
-   python -m http.server 8000
-   ```
-   Then open `http://localhost:8000` in your browser.
-
----
-
-## 📸 Updating Your Profile Photo Permanently
-
-To make your personal photo permanent in the codebase:
-1. Copy your photo into the `assets/` folder and name it `profile.jpg` (or `.png`).
-2. Alternatively, use the interactive **"Change Photo"** button right in the webpage!
-
----
-
-## 🌐 Free 1-Click Deployment
-
-- **GitHub Pages**: Push this repository to GitHub and enable Pages in repository settings under *Settings > Pages*.
-- **Vercel / Netlify**: Drag-and-drop this folder directly into [Netlify Drop](https://app.netlify.com/drop) for instant global hosting.
+    - *Driver Drowsiness Monitoring and Detection* (LSTM-KNN, Eye Aspect Ratio, Alarm Alert - 81.5% accuracy).
+  - **Experience**: Distinct Infotech Solutions (.NET & AI Solutions), AI Fire Lab (QA Tester).
+  - **Education & Certifications**: B.Tech from Vimal Jyothi Engineering College, IIT Madras Python for Data Science, White Track Technologies Power BI.
+  - **Direct Contact**: Kannur, Kerala, India | `sijinagsthi111@gmail.com` | `+91 8593990351`.
