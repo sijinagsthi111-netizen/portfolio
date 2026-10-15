@@ -1,19 +1,21 @@
 /**
- * Main Application Entrypoint for Sijin Agasthi's 3D Open-World Portfolio
- * Coordinates Three.js, Camera, World, Player, Audio, and UI.
+ * Main Application Orchestrator for Sijin Agasthi's 3D Open-World Portfolio
+ * Coordinates Three.js, Camera, World, Player, Audio, UI, and Debug Overlay.
  */
 
 import * as THREE from 'three';
 import { World } from './world.js';
 import { Player } from './player.js';
 import { UIManager } from './ui.js';
-import { stops } from './stops.js';
 
 class App {
   constructor() {
     this.container = document.getElementById('canvas-container');
     this.clock = new THREE.Clock();
     this.isPaused = false;
+    this.frameCount = 0;
+    this.fps = 60;
+    this.lastFpsUpdate = performance.now();
 
     this.initThree();
     this.initWorld();
@@ -22,6 +24,10 @@ class App {
     this.initDebug();
     this.setupEvents();
 
+    // Expose for Playwright test automation & inspection
+    window.__PORTFOLIO_APP__ = this;
+    window.__PORTFOLIO_PLAYER__ = this.player;
+
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
   }
@@ -29,7 +35,7 @@ class App {
   initThree() {
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xFCA88E); // Warm sunset golden-hour peach
+    this.scene.background = new THREE.Color(0xFCA88E); // Sunset peach
 
     // Camera
     const aspect = window.innerWidth / window.innerHeight;
@@ -50,7 +56,7 @@ class App {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDPR));
 
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
 
@@ -70,40 +76,74 @@ class App {
   }
 
   initDebug() {
-    // Optional lil-gui behind ?debug parameter
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('debug')) {
+    this.isDebug = urlParams.has('debug');
+
+    if (this.isDebug) {
+      // Build Real-Time Debug HUD Overlay
+      const hud = document.createElement('div');
+      hud.id = 'debug-hud-overlay';
+      hud.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #00FF66;
+        font-family: monospace;
+        font-size: 11px;
+        line-height: 1.5;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 102, 0.3);
+        z-index: 9999;
+        pointer-events: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      `;
+      document.body.appendChild(hud);
+      this.debugHud = hud;
+
+      // Also load lil-gui for parameter manipulation
       import('lil-gui').then(({ GUI }) => {
         const gui = new GUI({ title: '3D World Inspector' });
         const camFolder = gui.addFolder('Camera');
         camFolder.add(this.camera, 'fov', 30, 80).onChange(() => this.camera.updateProjectionMatrix());
 
         const modeFolder = gui.addFolder('Controls');
-        modeFolder.add(this.player, 'controlMode', ['scroll', 'free']).name('Mode');
-        modeFolder.add(this.player, 'scrollProgress', 0, 1, 0.01).name('Spline T').listen();
+        modeFolder.add(this.player, 'progress', 0, 1, 0.001).name('Progress').listen();
+        modeFolder.add(this.player, 'targetProgress', 0, 1, 0.001).name('Target Prog').listen();
         modeFolder.add(this.player, 'autoRide').name('Auto Ride').listen();
 
         const biomeFolder = gui.addFolder('Biome');
         biomeFolder.add({ biome: 'sunset' }, 'biome', ['sunset', 'day']).onChange((b) => this.world.setBiome(b));
-      });
+      }).catch(() => {});
     }
   }
 
   setupEvents() {
-    // Resize handling
+    // Window Resize
     window.addEventListener('resize', () => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Pause render loop when tab is hidden to conserve GPU/battery
+    // Pause when tab hidden and prevent delta spikes on resume
     document.addEventListener('visibilitychange', () => {
       this.isPaused = document.hidden;
       if (!this.isPaused) {
-        this.clock.getDelta(); // reset delta so no physics jump
+        this.clock.getDelta(); // flush pause duration
       }
     });
+  }
+
+  updateFPS() {
+    this.frameCount++;
+    const now = performance.now();
+    if (now - this.lastFpsUpdate >= 500) {
+      this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFpsUpdate));
+      this.frameCount = 0;
+      this.lastFpsUpdate = now;
+    }
   }
 
   animate() {
@@ -111,9 +151,13 @@ class App {
 
     if (this.isPaused) return;
 
-    const delta = Math.min(this.clock.getDelta(), 0.06);
+    // Clamp delta to prevent physics jumps
+    const rawDelta = this.clock.getDelta();
+    const delta = Math.min(rawDelta, 0.05);
 
-    // Update Player & Camera
+    this.updateFPS();
+
+    // Update Player physics, unified input, and animation mixer
     this.player.update(delta);
 
     // Update World environment animations
@@ -121,6 +165,21 @@ class App {
 
     // Update UI floating stop overlay detection
     this.ui.update(this.player.position);
+
+    // Update Debug HUD if active
+    if (this.isDebug && this.debugHud) {
+      const stats = this.player.getDebugStats();
+      this.debugHud.innerHTML = `
+        <div style="font-weight:bold; color:#FFF; margin-bottom:4px;">⚡ 3D PORTFOLIO DEBUG</div>
+        <div>FPS: <span style="color:#FFF">${this.fps}</span></div>
+        <div>Progress: <span style="color:#FFF">${stats.progress}</span></div>
+        <div>TargetProgress: <span style="color:#FFF">${stats.targetProgress}</span></div>
+        <div>Speed: <span style="color:#FFF">${stats.speed}</span></div>
+        <div>NormalizedSpeed: <span style="color:#FFF">${stats.normalizedSpeed}</span></div>
+        <div>Animation: <span style="color:#FFF; font-weight:bold;">${stats.animation}</span></div>
+        <div>Mixer Time: <span style="color:#FFF">${stats.mixerTime}s</span></div>
+      `;
+    }
 
     // Render Scene
     this.renderer.render(this.scene, this.camera);

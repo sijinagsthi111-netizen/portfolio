@@ -1,11 +1,12 @@
 /**
  * Player & Vehicle Module
- * Builds the stylized low-poly character on a yellow scooter, handles WASD / Arrow / Scroll / Joystick input,
- * wheel rotation, body banking, and smooth third-person chase camera.
+ * Implements ONE unified input pipeline (wheel, touch, keys, joystick) driving targetProgress,
+ * smoothed with exponential damping, AnimationMixer cross-fading, and chase camera.
  */
 
 import * as THREE from 'three';
 import { audio } from './audio.js';
+import { CharacterAnimationRig } from './animation.js';
 
 export class Player {
   constructor(scene, camera, pathCurve) {
@@ -13,22 +14,23 @@ export class Player {
     this.camera = camera;
     this.pathCurve = pathCurve;
 
-    // Movement mode: 'scroll' (default along spline route) or 'free'
-    this.controlMode = 'scroll';
-    this.scrollProgress = 0.001; // 0 to 1 along pathCurve
-    this.autoRide = false;
+    // --- UNIFIED ROUTE PROGRESS & DAMPING ---
+    this.progress = 0.001;        // Current smoothed progress (0 to 1)
+    this.targetProgress = 0.001;  // Target progress driven by wheel, touch, keys
+    this.speed = 0;               // Derived instantaneous speed
+    this.normalizedSpeed = 0;     // 0 to 1 for animations and sound
+    this.lateralOffset = 0;       // Sideways steering offset (-2.5 to 2.5)
+    this.targetLateralOffset = 0;
 
-    // Free roam physics
+    // Movement options
+    this.controlMode = 'scroll';
+    this.autoRide = false;
+    this.isFacingForward = true;
+
+    // Position & Rotation in World space
     this.position = new THREE.Vector3(0, 0.5, 0);
-    this.velocity = new THREE.Vector3();
+    this.targetPosition = new THREE.Vector3(0, 0.5, 0);
     this.rotation = 0;
-    this.speed = 0;
-    this.maxSpeed = 16.0;
-    this.boostMultiplier = 1.6;
-    this.acceleration = 18.0;
-    this.friction = 0.88;
-    this.turnSpeed = 2.4;
-    this.lateralOffset = 0; // sideways offset in scroll mode
 
     // Camera parameters
     this.cameraOffset = new THREE.Vector3(0, 3.8, 8.5);
@@ -37,7 +39,7 @@ export class Player {
     this.orbitPitch = 0;
     this.isDraggingCamera = false;
 
-    // Controls state
+    // Input state
     this.keys = {
       forward: false,
       backward: false,
@@ -48,7 +50,7 @@ export class Player {
     this.joystickVector = { x: 0, y: 0 };
 
     this.initModel();
-    this.setupInputs();
+    this.setupUnifiedInput();
   }
 
   initModel() {
@@ -110,7 +112,7 @@ export class Player {
     deck.receiveShadow = true;
     this.scooter.add(deck);
 
-    // Front apron / shield
+    // Front apron
     const shieldGeo = new THREE.BoxGeometry(0.65, 0.9, 0.18);
     const shield = new THREE.Mesh(shieldGeo, yellowMat);
     shield.position.set(0, 0.85, 0.75);
@@ -125,7 +127,7 @@ export class Player {
     headlight.position.set(0, 1.25, 0.85);
     this.scooter.add(headlight);
 
-    // Headlight beam (spotlight)
+    // Headlight spotlight beam
     this.headlightBeam = new THREE.SpotLight(0xFFF2D6, 2.5, 25, Math.PI / 6, 0.5, 1.5);
     this.headlightBeam.position.set(0, 1.25, 0.9);
     this.headlightBeamTarget = new THREE.Object3D();
@@ -141,7 +143,7 @@ export class Player {
     seat.castShadow = true;
     this.scooter.add(seat);
 
-    // Rear engine cover / fender
+    // Rear engine cover
     const rearGeo = new THREE.BoxGeometry(0.6, 0.5, 0.8);
     const rear = new THREE.Mesh(rearGeo, yellowMat);
     rear.position.set(0, 0.5, -0.5);
@@ -154,7 +156,7 @@ export class Player {
     taillight.position.set(0, 0.65, -0.92);
     this.scooter.add(taillight);
 
-    // Front fork & Handlebars (can rotate with steering)
+    // Front fork & Handlebars
     this.forkGroup = new THREE.Group();
     this.forkGroup.position.set(0, 0.4, 0.8);
 
@@ -167,16 +169,6 @@ export class Player {
     const bar = new THREE.Mesh(barGeo, chromeMat);
     bar.position.set(0, 1.05, 0);
     this.forkGroup.add(bar);
-
-    // Grips
-    const gripGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.16, 8);
-    gripGeo.rotateZ(Math.PI / 2);
-    const leftGrip = new THREE.Mesh(gripGeo, blackMat);
-    leftGrip.position.set(-0.4, 1.05, 0);
-    const rightGrip = new THREE.Mesh(gripGeo, blackMat);
-    rightGrip.position.set(0.4, 1.05, 0);
-    this.forkGroup.add(leftGrip);
-    this.forkGroup.add(rightGrip);
 
     // Front Wheel
     const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.14, 16);
@@ -204,7 +196,7 @@ export class Player {
     const torsoGeo = new THREE.BoxGeometry(0.48, 0.65, 0.35);
     const torso = new THREE.Mesh(torsoGeo, jacketMat);
     torso.position.set(0, 0.45, 0);
-    torso.rotation.x = 0.1; // leaning slightly forward
+    torso.rotation.x = 0.1;
     torso.castShadow = true;
     this.character.add(torso);
 
@@ -215,7 +207,7 @@ export class Player {
     head.castShadow = true;
     this.character.add(head);
 
-    // Short dark curly hair clusters
+    // Hair
     const hairGroup = new THREE.Group();
     const curlGeo = new THREE.SphereGeometry(0.1, 6, 6);
     const hairPositions = [
@@ -230,23 +222,21 @@ export class Player {
     });
     this.character.add(hairGroup);
 
-    // Arms reaching for handlebars
+    // Arms
     const armGeo = new THREE.BoxGeometry(0.12, 0.5, 0.12);
     const leftArm = new THREE.Mesh(armGeo, jacketMat);
     leftArm.position.set(-0.3, 0.45, 0.35);
     leftArm.rotation.x = -0.8;
-    leftArm.rotation.z = -0.15;
     leftArm.castShadow = true;
     this.character.add(leftArm);
 
     const rightArm = new THREE.Mesh(armGeo, jacketMat);
     rightArm.position.set(0.3, 0.45, 0.35);
     rightArm.rotation.x = -0.8;
-    rightArm.rotation.z = 0.15;
     rightArm.castShadow = true;
     this.character.add(rightArm);
 
-    // Legs sitting on scooter
+    // Legs
     const legGeo = new THREE.BoxGeometry(0.16, 0.45, 0.16);
     const leftLeg = new THREE.Mesh(legGeo, pantsMat);
     leftLeg.position.set(-0.2, 0.05, 0.25);
@@ -260,17 +250,34 @@ export class Player {
 
     this.group.add(this.character);
     this.scene.add(this.group);
+
+    // Initialize the Animation Rig & Mixer
+    this.animationRig = new CharacterAnimationRig(
+      this.character,
+      this.scooter,
+      [this.frontWheel, this.rearWheel]
+    );
   }
 
-  /**
-   * Slot for loading user-provided custom avatar GLB if desired.
-   */
-  loadCustomAvatar(glbUrl) {
-    console.log(`[Player] Ready to swap custom avatar from: ${glbUrl}`);
-    // Will be populated if custom GLB is placed in public/models/
-  }
+  setupUnifiedInput() {
+    // 1. NORMALIZE WHEEL INPUT
+    window.addEventListener('wheel', (e) => {
+      // Normalize wheel delta across pixel, line, and page scroll modes
+      let pixelDelta = e.deltaY;
+      if (e.deltaMode === 1) {
+        // DOM_DELTA_LINE
+        pixelDelta *= 28;
+      } else if (e.deltaMode === 2) {
+        // DOM_DELTA_PAGE
+        pixelDelta *= 400;
+      }
 
-  setupInputs() {
+      // Scroll down = forward (positive), scroll up = backward (negative)
+      const increment = pixelDelta * 0.00032;
+      this.targetProgress = (this.targetProgress + increment + 1) % 1;
+    }, { passive: true });
+
+    // 2. KEYBOARD CONTROLS
     window.addEventListener('keydown', (e) => {
       switch (e.code) {
         case 'KeyW':
@@ -324,7 +331,37 @@ export class Player {
       }
     });
 
-    // Mouse drag for camera orbit
+    // 3. TOUCH DRAG FOR SCROLL & CAMERA
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let isTouchActive = false;
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.target.closest('#menu-panel') || e.target.closest('#simple-version-modal') || e.target.closest('#joystick-base')) {
+        return;
+      }
+      if (e.touches.length === 1) {
+        isTouchActive = true;
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isTouchActive || e.touches.length === 0) return;
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY - currentY; // Swipe up = drive forward
+      touchStartY = currentY;
+
+      const increment = deltaY * 0.0012;
+      this.targetProgress = (this.targetProgress + increment + 1) % 1;
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      isTouchActive = false;
+    }, { passive: true });
+
+    // 4. MOUSE DRAG FOR CAMERA ORBIT
     window.addEventListener('mousedown', (e) => {
       if (e.target.tagName === 'CANVAS') {
         this.isDraggingCamera = true;
@@ -347,12 +384,6 @@ export class Player {
     window.addEventListener('mouseup', () => {
       this.isDraggingCamera = false;
     });
-
-    // Scroll wheel driving (Scroll Mode)
-    window.addEventListener('wheel', (e) => {
-      const delta = e.deltaY * 0.00035;
-      this.scrollProgress = (this.scrollProgress + delta + 1) % 1;
-    }, { passive: true });
   }
 
   setJoystick(vector) {
@@ -368,111 +399,103 @@ export class Player {
     return this.autoRide;
   }
 
-  jumpToProgress(progress) {
-    this.scrollProgress = Math.max(0, Math.min(0.999, progress));
+  jumpToProgress(prog) {
+    this.targetProgress = Math.max(0, Math.min(0.999, prog));
+    this.progress = this.targetProgress;
     if (this.pathCurve) {
-      const pt = this.pathCurve.getPointAt(this.scrollProgress);
+      const pt = this.pathCurve.getPointAt(this.progress);
       this.position.copy(pt);
       this.group.position.copy(pt);
     }
   }
 
   update(delta) {
-    const isMovingForward = this.keys.forward || this.autoRide || (this.joystickVector.y > 0.1);
-    const isMovingBackward = this.keys.backward || (this.joystickVector.y < -0.1);
-    const isSteeringLeft = this.keys.left || (this.joystickVector.x < -0.1);
-    const isSteeringRight = this.keys.right || (this.joystickVector.x > 0.1);
-    const isBoosting = this.keys.boost;
+    // 1. Process keys / auto-ride into targetProgress
+    const isForward = this.keys.forward || this.autoRide || (this.joystickVector.y > 0.1);
+    const isBackward = this.keys.backward || (this.joystickVector.y < -0.1);
+    const isBoost = this.keys.boost;
+    const isLeft = this.keys.left || (this.joystickVector.x < -0.1);
+    const isRight = this.keys.right || (this.joystickVector.x > 0.1);
 
-    // SCROLL MODE UPDATE
-    if (this.controlMode === 'scroll' && this.pathCurve) {
-      let speedIncrement = 0;
-      if (this.autoRide) {
-        speedIncrement = 0.04 * delta;
-      } else if (isMovingForward) {
-        speedIncrement = (isBoosting ? 0.08 : 0.05) * delta;
-      } else if (isMovingBackward) {
-        speedIncrement = -0.04 * delta;
-      }
+    const baseKeySpeed = isBoost ? 0.08 : 0.045;
+    if (isForward) {
+      this.targetProgress = (this.targetProgress + baseKeySpeed * delta + 1) % 1;
+    } else if (isBackward) {
+      this.targetProgress = (this.targetProgress - (baseKeySpeed * 0.7) * delta + 1) % 1;
+    }
 
-      this.scrollProgress = (this.scrollProgress + speedIncrement + 1) % 1;
+    // 2. Exponential Damping: progress smoothly chases targetProgress
+    // Handle wrap-around distance for shortest angular path
+    let diff = this.targetProgress - this.progress;
+    if (diff > 0.5) diff -= 1.0;
+    if (diff < -0.5) diff += 1.0;
 
-      // Calculate position & tangent on path
-      const pathPoint = this.pathCurve.getPointAt(this.scrollProgress);
-      const tangent = this.pathCurve.getTangentAt(this.scrollProgress).normalize();
+    const dampingFactor = 1.0 - Math.exp(-6.0 * delta);
+    const prevProgress = this.progress;
+    this.progress = (this.progress + diff * dampingFactor + 1.0) % 1.0;
 
-      // Sideways offset with A/D
-      if (isSteeringLeft) {
-        this.lateralOffset = Math.max(-2.5, this.lateralOffset - 3.0 * delta);
-      } else if (isSteeringRight) {
-        this.lateralOffset = Math.min(2.5, this.lateralOffset + 3.0 * delta);
+    // 3. Derive Instantaneous Speed
+    const rawStep = Math.abs(diff * dampingFactor);
+    this.speed = rawStep / Math.max(delta, 0.001) * 140.0;
+    this.normalizedSpeed = Math.min(1.0, this.speed / 12.0);
+
+    // Direction (moving forward or reversing)
+    if (Math.abs(diff) > 0.0001) {
+      this.isFacingForward = diff >= 0;
+    }
+
+    // 4. Update Path Position & Tangent
+    if (this.pathCurve) {
+      const pathPoint = this.pathCurve.getPointAt(this.progress);
+      const tangent = this.pathCurve.getTangentAt(this.progress).normalize();
+
+      // Sideways steering offset with A/D
+      if (isLeft) {
+        this.targetLateralOffset = Math.max(-2.5, this.targetLateralOffset - 4.0 * delta);
+      } else if (isRight) {
+        this.targetLateralOffset = Math.min(2.5, this.targetLateralOffset + 4.0 * delta);
       } else {
-        this.lateralOffset *= 0.94; // recenter smoothly
+        this.targetLateralOffset *= Math.exp(-4.0 * delta); // return to center
       }
+      this.lateralOffset += (this.targetLateralOffset - this.lateralOffset) * dampingFactor;
 
       const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
       this.position.copy(pathPoint).addScaledVector(normal, this.lateralOffset);
       this.group.position.copy(this.position);
 
-      // Align group rotation with path tangent
-      const targetAngle = Math.atan2(tangent.x, tangent.z);
-      this.group.rotation.y = targetAngle;
+      // Facing angle (tangent or reversed if backward)
+      const moveAngle = Math.atan2(tangent.x, tangent.z);
+      const finalAngle = this.isFacingForward ? moveAngle : moveAngle + Math.PI;
 
-      // Handlebar steering rotation & body bank
-      const targetSteer = (isSteeringLeft ? 0.35 : isSteeringRight ? -0.35 : 0);
+      // Smooth rotation interpolation
+      let angleDiff = finalAngle - this.group.rotation.y;
+      while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+      while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+      this.group.rotation.y += angleDiff * (1.0 - Math.exp(-8.0 * delta));
+
+      // Handlebar steering rotation & dynamic banking
+      const targetSteer = (isLeft ? 0.35 : isRight ? -0.35 : 0);
       this.forkGroup.rotation.y = THREE.MathUtils.lerp(this.forkGroup.rotation.y, targetSteer, 0.2);
-      this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, -targetSteer * 0.4, 0.15);
-
-      this.speed = Math.abs(speedIncrement) * 150;
-    } else {
-      // FREE ROAM MODE UPDATE
-      if (isMovingForward) {
-        const boost = isBoosting ? this.boostMultiplier : 1.0;
-        this.speed = Math.min(this.maxSpeed * boost, this.speed + this.acceleration * delta);
-      } else if (isMovingBackward) {
-        this.speed = Math.max(-this.maxSpeed * 0.5, this.speed - this.acceleration * delta);
-      } else {
-        this.speed *= this.friction;
-      }
-
-      if (isSteeringLeft) {
-        this.rotation += this.turnSpeed * delta * (this.speed >= 0 ? 1 : -1);
-        this.forkGroup.rotation.y = THREE.MathUtils.lerp(this.forkGroup.rotation.y, 0.45, 0.2);
-        this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, -0.15, 0.15);
-      } else if (isSteeringRight) {
-        this.rotation -= this.turnSpeed * delta * (this.speed >= 0 ? 1 : -1);
-        this.forkGroup.rotation.y = THREE.MathUtils.lerp(this.forkGroup.rotation.y, -0.45, 0.2);
-        this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, 0.15, 0.15);
-      } else {
-        this.forkGroup.rotation.y = THREE.MathUtils.lerp(this.forkGroup.rotation.y, 0, 0.2);
-        this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, 0, 0.15);
-      }
-
-      this.group.rotation.y = this.rotation;
-      const forwardDir = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), this.rotation);
-      this.position.addScaledVector(forwardDir, this.speed * delta);
-      this.group.position.copy(this.position);
+      this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, -targetSteer * 0.45, 0.15);
     }
 
-    // Spin wheels with travel speed
-    const wheelRotSpeed = this.speed * delta * 5.0;
-    this.frontWheel.rotation.x += wheelRotSpeed;
-    this.rearWheel.rotation.x += wheelRotSpeed;
+    // 5. Update Animation Rig & Mixer (idle, walk, ride cross-fade)
+    if (this.animationRig) {
+      const signedSpeed = this.isFacingForward ? this.speed : -this.speed;
+      this.animationRig.update(delta, signedSpeed, this.normalizedSpeed);
+    }
 
-    // Update audio engine frequency
-    audio.setSpeed(this.speed / this.maxSpeed);
+    // 6. Audio Engine Modulation
+    audio.setSpeed(this.normalizedSpeed);
 
-    // Gentle engine idle / ride vibration
-    this.character.position.y = 0.75 + Math.sin(Date.now() * 0.015) * 0.012;
-
-    // --- CHASE CAMERA UPDATE ---
+    // 7. Update Third-Person Chase Camera
     this.updateCamera(delta);
   }
 
   updateCamera(delta) {
     if (!this.camera) return;
 
-    // Follow offset rotated by vehicle rotation + manual orbit drag
+    // Follow offset behind the vehicle's direction
     const currentAngle = this.group.rotation.y + this.orbitYaw;
     const distance = 8.5;
     const height = 4.0 + this.orbitPitch * 3.5;
@@ -482,7 +505,7 @@ export class Player {
     const camY = this.position.y + height;
 
     const targetPos = new THREE.Vector3(camX, camY, camZ);
-    this.camera.position.lerp(targetPos, 0.09);
+    this.camera.position.lerp(targetPos, 1.0 - Math.exp(-6.5 * delta));
 
     // Look at player chest
     const lookTarget = new THREE.Vector3(
@@ -492,10 +515,21 @@ export class Player {
     );
     this.camera.lookAt(lookTarget);
 
-    // Damping mouse orbit smoothly back towards forward view when not dragging
+    // Smooth return from orbit drag
     if (!this.isDraggingCamera) {
-      this.orbitYaw = THREE.MathUtils.lerp(this.orbitYaw, 0, 0.03);
-      this.orbitPitch = THREE.MathUtils.lerp(this.orbitPitch, 0, 0.03);
+      this.orbitYaw = THREE.MathUtils.lerp(this.orbitYaw, 0, 0.04);
+      this.orbitPitch = THREE.MathUtils.lerp(this.orbitPitch, 0, 0.04);
     }
+  }
+
+  getDebugStats() {
+    return {
+      progress: this.progress.toFixed(4),
+      targetProgress: this.targetProgress.toFixed(4),
+      speed: this.speed.toFixed(2),
+      normalizedSpeed: this.normalizedSpeed.toFixed(2),
+      animation: this.animationRig ? this.animationRig.activeActionName : 'none',
+      mixerTime: this.animationRig ? this.animationRig.mixer.time.toFixed(2) : '0',
+    };
   }
 }
