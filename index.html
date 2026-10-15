@@ -1,18 +1,289 @@
 <!doctype html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="h-full w-full bg-[#181A1B] text-white">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
     <title>Sijin Agasthi — Software Developer & AI Engineer</title>
     <meta name="description" content="Portfolio of Sijin Agasthi, Software Developer and AI Engineer specializing in .NET applications, machine learning, and generative AI." />
-    <!-- Preconnect to Google Fonts -->
+    
+    <!-- Google Fonts: Orbitron (techno-geometric display font) & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .font-display {
+        font-family: 'Orbitron', monospace;
+      }
+      /* Floating 3D Text Shadow */
+      .glow-text {
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 209, 102, 0.4);
+      }
+      .glass-hud {
+        background: rgba(22, 27, 34, 0.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      }
+      /* Custom Scooter Drive Loader Animation */
+      @keyframes scooterDrive {
+        0% { transform: translateX(-120%); }
+        100% { transform: translateX(120%); }
+      }
+      .scooter-anim {
+        animation: scooterDrive 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      /* Sound equalizer bar bounce */
+      @keyframes eqBounce {
+        0%, 100% { height: 4px; }
+        50% { height: 18px; }
+      }
+    </style>
   </head>
-  <body class="bg-black text-[#9a9a9a] font-body selection:bg-white selection:text-black overflow-x-hidden antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="relative w-full h-full bg-black select-none">
+    
+    <!-- 3D Three.js Canvas Container -->
+    <div id="canvas-container" class="absolute inset-0 z-0"></div>
+
+    <!-- White-out Dissolve Overlay -->
+    <div id="dissolve-overlay" class="fixed inset-0 z-50 bg-[#FED0C5] pointer-events-none opacity-0 transition-opacity duration-500"></div>
+
+    <!-- 1. LOADER SCREEN (Plain light-grey screen, ghosted skyline, percent counter, start button) -->
+    <div id="loader-screen" class="fixed inset-0 z-40 bg-[#E8ECEF] text-[#2C3A47] flex flex-col items-center justify-between py-16 px-6 transition-all duration-700">
+      
+      <!-- Top Title -->
+      <div class="text-center space-y-1">
+        <h1 class="font-display text-xl sm:text-2xl font-bold tracking-[0.2em] text-[#2C3A47] uppercase">
+          SIJIN AGASTHI
+        </h1>
+        <p class="text-xs sm:text-sm font-mono tracking-widest text-[#718096] uppercase">
+          Software Developer & AI Engineer • 3D World
+        </p>
+      </div>
+
+      <!-- Center Animation: Scooter driving across ghosted skyline -->
+      <div class="w-full max-w-lg flex flex-col items-center space-y-8">
+        <div class="relative w-full h-24 overflow-hidden border-b-2 border-[#CBD5E0]">
+          <!-- Ghosted Skyline Silhouette -->
+          <svg class="absolute bottom-0 w-full h-16 opacity-35" viewBox="0 0 400 60" preserveAspectRatio="none">
+            <rect x="10" y="20" width="30" height="40" fill="#A0AEC0" />
+            <rect x="45" y="10" width="25" height="50" fill="#CBD5E0" />
+            <polygon points="57,0 45,10 70,10" fill="#CBD5E0" />
+            <rect x="75" y="25" width="40" height="35" fill="#A0AEC0" />
+            <rect x="120" y="15" width="20" height="45" fill="#CBD5E0" />
+            <rect x="145" y="30" width="50" height="30" fill="#A0AEC0" />
+            <rect x="200" y="8" width="35" height="52" fill="#CBD5E0" />
+            <polygon points="217,-2 200,8 235,8" fill="#CBD5E0" />
+            <rect x="240" y="22" width="25" height="38" fill="#A0AEC0" />
+            <rect x="270" y="18" width="45" height="42" fill="#CBD5E0" />
+            <rect x="320" y="28" width="30" height="32" fill="#A0AEC0" />
+            <rect x="355" y="12" width="35" height="48" fill="#CBD5E0" />
+          </svg>
+
+          <!-- Animated Low-Poly Yellow Scooter -->
+          <div class="absolute bottom-1 w-12 h-10 scooter-anim">
+            <svg viewBox="0 0 64 48" class="w-full h-full drop-shadow-md">
+              <circle cx="16" cy="38" r="7" fill="#2D3748" />
+              <circle cx="16" cy="38" r="3" fill="#E2E8F0" />
+              <circle cx="48" cy="38" r="7" fill="#2D3748" />
+              <circle cx="48" cy="38" r="3" fill="#E2E8F0" />
+              <path d="M16 38 L30 38 L38 26 L48 26" stroke="#F6AD55" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <path d="M48 26 L42 12" stroke="#CBD5E0" stroke-width="4" stroke-linecap="round"/>
+              <line x1="36" y1="12" x2="48" y2="12" stroke="#2D3748" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="43" cy="14" r="3" fill="#FAF089"/>
+              <rect x="24" y="28" width="10" height="5" rx="2" fill="#2D3748" />
+              <!-- Character silhouette -->
+              <circle cx="34" cy="8" r="5" fill="#2D3748"/>
+              <path d="M34 13 L32 28 L40 28" stroke="#4A5568" stroke-width="6" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Big Percent Counter -->
+        <div id="loader-percent" class="font-display text-5xl sm:text-7xl font-extrabold text-[#2C3A47] tracking-tight">
+          000%
+        </div>
+
+        <p class="text-xs text-[#718096] font-mono tracking-widest uppercase">
+          Synthesizing low-poly world & soundscape...
+        </p>
+      </div>
+
+      <!-- Small "Start" Button -->
+      <div>
+        <button id="loader-start-btn" class="opacity-0 pointer-events-none transition-all duration-300 px-8 py-3.5 rounded-full bg-[#2C3A47] text-white font-display text-xs sm:text-sm font-bold tracking-[0.2em] uppercase hover:bg-[#1A202C] hover:scale-105 active:scale-95 shadow-xl">
+          START EXPLORING
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. TOP RIGHT UI CHROME: Hamburger Menu & Sound Toggle -->
+    <div class="fixed top-5 right-5 z-30 flex flex-col items-end space-y-2.5">
+      <!-- Hamburger Menu Button -->
+      <button id="menu-btn" class="glass-hud w-11 h-11 rounded-2xl flex items-center justify-center text-white hover:border-amber-400 transition-all shadow-lg focus:outline-none" aria-label="Toggle navigation menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Sound / Equalizer Toggle Button -->
+      <button id="sound-toggle-btn" class="glass-hud w-11 h-11 rounded-2xl flex items-center justify-center space-x-1 px-2.5 text-white hover:border-amber-400 transition-all shadow-lg focus:outline-none" aria-label="Toggle audio">
+        <span class="sound-bar w-1 bg-amber-400 rounded-full transition-all" style="height: 4px;"></span>
+        <span class="sound-bar w-1 bg-amber-400 rounded-full transition-all" style="height: 8px;"></span>
+        <span class="sound-bar w-1 bg-amber-400 rounded-full transition-all" style="height: 6px;"></span>
+        <span class="sound-bar w-1 bg-amber-400 rounded-full transition-all" style="height: 12px;"></span>
+      </button>
+
+      <!-- Dropdown Menu Panel -->
+      <div id="menu-panel" class="hidden glass-hud w-64 rounded-2xl p-4 mt-2 shadow-2xl border border-white/15 text-xs font-mono space-y-2.5">
+        <div class="pb-2 border-b border-white/10 flex items-center justify-between text-[11px] text-amber-300 font-display">
+          <span>PORTFOLIO STOPS</span>
+          <span>(10 TOTAL)</span>
+        </div>
+        <div class="space-y-1">
+          <button data-jump-stop="hero" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">01. Spawn Plaza (Hero)</button>
+          <button data-jump-stop="about" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">02. Landmark Arch (About)</button>
+          <button data-jump-stop="skills" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">03. The Skill Zone Gate</button>
+          <button data-jump-stop="projects" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">04. Canal Bridge (Projects)</button>
+          <button data-jump-stop="timeline" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">05. Journey Road (Timeline)</button>
+          <button data-jump-stop="portal" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">06. Glowing Ring Portal</button>
+          <button data-jump-stop="contact" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">07. Contact Hub (Day Biome)</button>
+          <button data-jump-stop="letters" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">08. Giant 3D Letters Street</button>
+          <button data-jump-stop="final" class="w-full text-left py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors">09. Final Gallery Room</button>
+        </div>
+        <div class="pt-2 border-t border-white/10">
+          <button id="view-simple-btn" class="w-full py-2 px-3 text-center rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors">
+            View Simple Version
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. TOP LEFT HUD: Current World Stop Badge & Controls Hint -->
+    <div class="fixed top-5 left-5 z-20 pointer-events-none flex flex-col space-y-2">
+      <div id="hud-stop-label" class="glass-hud px-4 py-2 rounded-full text-[11px] font-display tracking-widest text-amber-300 uppercase shadow-lg">
+        STOP 01: SPAWN PLAZA (HERO)
+      </div>
+      <div class="hidden sm:block text-[10px] font-mono text-neutral-400 glow-text pl-1">
+        [Scroll / W A S D] Drive • [Shift] Boost • [Space] Honk
+      </div>
+    </div>
+
+    <!-- 4. FLOATING 3D-STYLE OVERLAY PANEL (Positioned bottom-center, fades in at landmarks) -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-20 w-[92vw] max-w-xl pointer-events-none">
+      <div id="floating-card-overlay" class="glass-hud p-6 sm:p-7 rounded-3xl opacity-0 translate-y-4 transition-all duration-500 pointer-events-none border border-white/20">
+        <!-- Injected dynamically by UIManager -->
+      </div>
+    </div>
+
+    <!-- 5. MOBILE VIRTUAL JOYSTICK & AUTO-RIDE (Bottom Left / Right) -->
+    <div class="md:hidden fixed bottom-6 left-6 z-30 flex items-center space-x-4">
+      <div id="joystick-base" class="w-24 h-24 rounded-full bg-black/50 border-2 border-white/20 backdrop-blur-md relative flex items-center justify-center touch-none">
+        <div id="joystick-thumb" class="w-10 h-10 rounded-full bg-amber-400 shadow-md"></div>
+      </div>
+      <button id="auto-ride-btn" class="px-4 py-2.5 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-[10px] font-mono tracking-wider text-white">
+        AUTO RIDE: OFF
+      </button>
+    </div>
+
+    <!-- 6. ACCESSIBLE SIMPLE VERSION MODAL (Screen Reader & Reduced Motion Friendly) -->
+    <div id="simple-version-modal" class="hidden fixed inset-0 z-50 bg-[#121417] text-neutral-200 overflow-y-auto p-6 sm:p-12">
+      <div class="max-w-3xl mx-auto space-y-10 pb-16">
+        <div class="flex items-center justify-between pb-6 border-b border-neutral-800">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white font-display">Sijin Agasthi</h1>
+            <p class="text-sm text-amber-400 font-mono">Software Developer & AI Engineer</p>
+          </div>
+          <button id="close-simple-btn" class="px-4 py-2 rounded-xl bg-neutral-800 text-white text-xs font-mono hover:bg-neutral-700">
+            Close ✕
+          </button>
+        </div>
+
+        <!-- Bio -->
+        <section class="space-y-3">
+          <h2 class="text-lg font-bold text-white font-display border-l-2 border-amber-400 pl-3">About Sijin</h2>
+          <p class="text-sm leading-relaxed text-neutral-300">
+            Software Developer & AI Engineer building .NET applications, machine learning and generative AI solutions. B.Tech graduate from Vimal Jyothi Engineering College, based in Kannur, Kerala.
+          </p>
+        </section>
+
+        <!-- Skills -->
+        <section class="space-y-3">
+          <h2 class="text-lg font-bold text-white font-display border-l-2 border-amber-400 pl-3">Technical Skills</h2>
+          <div class="flex flex-wrap gap-2 text-xs font-mono">
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Python</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">C#</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">.NET</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">ASP.NET</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Java</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">C / C++</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Power BI</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Matplotlib</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">R Programming</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Raspberry Pi</span>
+            <span class="px-3 py-1.5 rounded-lg bg-neutral-800">Generative AI / LLMs</span>
+          </div>
+        </section>
+
+        <!-- Projects -->
+        <section class="space-y-4">
+          <h2 class="text-lg font-bold text-white font-display border-l-2 border-amber-400 pl-3">Featured Projects</h2>
+          <div class="space-y-4">
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-2">
+              <div class="flex justify-between items-center">
+                <h3 class="font-bold text-white">VisionAid</h3>
+                <span class="text-xs text-amber-400 font-mono">Real-Time Voice Assistance</span>
+              </div>
+              <p class="text-xs text-neutral-300 leading-relaxed">
+                Smart glasses system using a Raspberry Pi and camera that delivers real-time voice assistance. Uses generative AI for multi-modal processing (real-time object detection and scene-to-text from a live camera feed) and a lightweight database to send enriched prompts to an LLM, turning personalised text responses into speech.
+              </p>
+            </div>
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-2">
+              <div class="flex justify-between items-center">
+                <h3 class="font-bold text-white">Driver Drowsiness Monitoring and Detection</h3>
+                <span class="text-xs text-emerald-400 font-mono">81.5% Accuracy</span>
+              </div>
+              <p class="text-xs text-neutral-300 leading-relaxed">
+                Drowsiness detection system using LSTM-KNN for face detection and Eye Aspect Ratio (EAR) analysis to identify eye closure, with an alarm trigger on fatigue detection for real-time driver safety monitoring.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Timeline -->
+        <section class="space-y-3">
+          <h2 class="text-lg font-bold text-white font-display border-l-2 border-amber-400 pl-3">Career & Certified Timeline</h2>
+          <div class="space-y-3 text-xs font-mono">
+            <div><strong class="text-amber-400">2026:</strong> Software Developer & AI Engineer at Distinct Infotech Solutions (Aug 2026 – Present); Freelance Software Tester at AI Fire Lab.</div>
+            <div><strong class="text-amber-400">2025:</strong> Python for Data Science (IIT Madras NPTEL).</div>
+            <div><strong class="text-amber-400">2024:</strong> Power BI Certification (data visualization, data modeling).</div>
+            <div><strong class="text-amber-400">2023:</strong> Data analytics with Python & R; CUSAT Humanoid Robotics workshop; IIT Delhi Cyber Security & Ethical Hacking workshop.</div>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="space-y-3">
+          <h2 class="text-lg font-bold text-white font-display border-l-2 border-amber-400 pl-3">Contact</h2>
+          <div class="space-y-2 text-xs font-mono">
+            <p>Email: <a href="mailto:sijinagsthi111@gmail.com" class="text-amber-400 hover:underline">sijinagsthi111@gmail.com</a></p>
+            <p>GitHub: <a href="https://github.com/sijinagsthi111-netizen" target="_blank" class="text-amber-400 hover:underline">github.com/sijinagsthi111-netizen</a></p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Application Script Entrypoint -->
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
