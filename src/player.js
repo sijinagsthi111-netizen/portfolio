@@ -26,6 +26,7 @@ export class Player {
     this.controlMode = 'scroll';
     this.autoRide = false;
     this.isFacingForward = true;
+    this.isMounted = false;
 
     // Position & Rotation in World space
     this.position = new THREE.Vector3(0, 0.5, 0);
@@ -187,27 +188,28 @@ export class Player {
     this.scooter.add(this.rearWheel);
 
     this.group.add(this.scooter);
+    this.scooter.visible = false; // Starts on foot at Spawn Plaza
 
-    // --- CHARACTER ON SCOOTER ---
+    // --- CHARACTER MODEL ---
     this.character = new THREE.Group();
-    this.character.position.set(0, 0.75, -0.2);
+    this.character.position.set(0, 0.46, 0); // On foot height
 
-    // Torso / Jacket
+    // Torso / Jacket (child 0)
     const torsoGeo = new THREE.BoxGeometry(0.48, 0.65, 0.35);
     const torso = new THREE.Mesh(torsoGeo, jacketMat);
     torso.position.set(0, 0.45, 0);
-    torso.rotation.x = 0.1;
+    torso.rotation.x = 0.05;
     torso.castShadow = true;
     this.character.add(torso);
 
-    // Head
+    // Head (child 1)
     const headGeo = new THREE.BoxGeometry(0.32, 0.35, 0.32);
     const head = new THREE.Mesh(headGeo, skinMat);
     head.position.set(0, 0.95, 0.05);
     head.castShadow = true;
     this.character.add(head);
 
-    // Hair
+    // Hair (child 2)
     const hairGroup = new THREE.Group();
     const curlGeo = new THREE.SphereGeometry(0.1, 6, 6);
     const hairPositions = [
@@ -222,30 +224,30 @@ export class Player {
     });
     this.character.add(hairGroup);
 
-    // Arms
-    const armGeo = new THREE.BoxGeometry(0.12, 0.5, 0.12);
+    // Arms with shoulder pivot (child 3 & 4)
+    const armGeo = new THREE.BoxGeometry(0.12, 0.48, 0.12);
+    armGeo.translate(0, -0.22, 0); // pivot at shoulder
+
     const leftArm = new THREE.Mesh(armGeo, jacketMat);
-    leftArm.position.set(-0.3, 0.45, 0.35);
-    leftArm.rotation.x = -0.8;
+    leftArm.position.set(-0.3, 0.7, 0);
     leftArm.castShadow = true;
     this.character.add(leftArm);
 
     const rightArm = new THREE.Mesh(armGeo, jacketMat);
-    rightArm.position.set(0.3, 0.45, 0.35);
-    rightArm.rotation.x = -0.8;
+    rightArm.position.set(0.3, 0.7, 0);
     rightArm.castShadow = true;
     this.character.add(rightArm);
 
-    // Legs
-    const legGeo = new THREE.BoxGeometry(0.16, 0.45, 0.16);
+    // Legs with hip pivot (child 5 & 6)
+    const legGeo = new THREE.BoxGeometry(0.16, 0.46, 0.16);
+    legGeo.translate(0, -0.21, 0); // pivot at hip
+
     const leftLeg = new THREE.Mesh(legGeo, pantsMat);
-    leftLeg.position.set(-0.2, 0.05, 0.25);
-    leftLeg.rotation.x = -0.5;
+    leftLeg.position.set(-0.16, 0.22, 0);
     this.character.add(leftLeg);
 
     const rightLeg = new THREE.Mesh(legGeo, pantsMat);
-    rightLeg.position.set(0.2, 0.05, 0.25);
-    rightLeg.rotation.x = -0.5;
+    rightLeg.position.set(0.16, 0.22, 0);
     this.character.add(rightLeg);
 
     this.group.add(this.character);
@@ -410,6 +412,19 @@ export class Player {
   }
 
   update(delta) {
+    // 0. Update mounted status (rides scooter between Stop 2 Archway and Stop 9 Gallery)
+    const shouldBeMounted = (this.progress >= 0.075 && this.progress < 0.88);
+    if (this.isMounted !== shouldBeMounted) {
+      this.isMounted = shouldBeMounted;
+      this.scooter.visible = this.isMounted;
+      if (this.isMounted) {
+        this.character.position.set(0, 0.75, -0.2);
+      } else {
+        this.character.position.set(0, 0.46, 0);
+      }
+      this.animationRig.setMounted(this.isMounted);
+    }
+
     // 1. Process keys / auto-ride into targetProgress
     const isForward = this.keys.forward || this.autoRide || (this.joystickVector.y > 0.1);
     const isBackward = this.keys.backward || (this.joystickVector.y < -0.1);
@@ -430,13 +445,18 @@ export class Player {
     if (diff > 0.5) diff -= 1.0;
     if (diff < -0.5) diff += 1.0;
 
-    const dampingFactor = 1.0 - Math.exp(-6.0 * delta);
-    const prevProgress = this.progress;
+    // Epsilon deadband: snaps when within threshold to eliminate micro-creeping at damping tail
+    if (Math.abs(diff) < 0.005) {
+      this.progress = this.targetProgress;
+      diff = 0;
+    }
+
+    const dampingFactor = 1.0 - Math.exp(-8.0 * delta);
     this.progress = (this.progress + diff * dampingFactor + 1.0) % 1.0;
 
     // 3. Derive Instantaneous Speed
     const rawStep = Math.abs(diff * dampingFactor);
-    this.speed = rawStep / Math.max(delta, 0.001) * 140.0;
+    this.speed = (diff === 0) ? 0 : (rawStep / Math.max(delta, 0.001) * 140.0);
     this.normalizedSpeed = Math.min(1.0, this.speed / 12.0);
 
     // Direction (moving forward or reversing)
@@ -473,7 +493,7 @@ export class Player {
       while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
       this.group.rotation.y += angleDiff * (1.0 - Math.exp(-8.0 * delta));
 
-      // Handlebar steering rotation & dynamic banking
+      // Handlebar steering rotation & dynamic banking (when mounted)
       const targetSteer = (isLeft ? 0.35 : isRight ? -0.35 : 0);
       this.forkGroup.rotation.y = THREE.MathUtils.lerp(this.forkGroup.rotation.y, targetSteer, 0.2);
       this.scooter.rotation.z = THREE.MathUtils.lerp(this.scooter.rotation.z, -targetSteer * 0.45, 0.15);
@@ -482,7 +502,7 @@ export class Player {
     // 5. Update Animation Rig & Mixer (idle, walk, ride cross-fade)
     if (this.animationRig) {
       const signedSpeed = this.isFacingForward ? this.speed : -this.speed;
-      this.animationRig.update(delta, signedSpeed, this.normalizedSpeed);
+      this.animationRig.update(delta, signedSpeed, this.normalizedSpeed, this.isMounted);
     }
 
     // 6. Audio Engine Modulation
@@ -495,10 +515,11 @@ export class Player {
   updateCamera(delta) {
     if (!this.camera) return;
 
-    // Follow offset behind the vehicle's direction
+    // Follow offset behind the vehicle's/character's direction
     const currentAngle = this.group.rotation.y + this.orbitYaw;
-    const distance = 8.5;
-    const height = 4.0 + this.orbitPitch * 3.5;
+    const distance = this.isMounted ? 8.5 : 6.2;
+    const baseHeight = this.isMounted ? 4.0 : 2.8;
+    const height = baseHeight + this.orbitPitch * (this.isMounted ? 3.5 : 2.5);
 
     const camX = this.position.x - Math.sin(currentAngle) * distance;
     const camZ = this.position.z - Math.cos(currentAngle) * distance;
@@ -510,7 +531,7 @@ export class Player {
     // Look at player chest
     const lookTarget = new THREE.Vector3(
       this.position.x,
-      this.position.y + 1.6,
+      this.position.y + (this.isMounted ? 1.6 : 1.1),
       this.position.z
     );
     this.camera.lookAt(lookTarget);

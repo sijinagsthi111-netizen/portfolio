@@ -515,9 +515,16 @@ export class World {
     );
     lintel.position.set(0, 12.5, 0);
     lintel.castShadow = true;
-    archGroup.add(lintel);
-
     this.scene.add(archGroup);
+
+    // Parked Scooter at Stop 2 with animated floating "Hi!" speech card
+    this.buildParkedScooter(41.5, 0.35, -31, -0.4, true);
+
+    // Monumental Eiffel Tower Archway spanning the avenue
+    this.buildEiffelTowerArch();
+
+    // Animated Rotating Ferris Wheel on the sunset horizon
+    this.buildFerrisWheel();
 
     // 3. SKILL ZONE GATE: Gateway between two high buildings with vertical skill bars
     const skillGate = new THREE.Group();
@@ -598,6 +605,9 @@ export class World {
     billboard2.rotation.y = -Math.PI / 4;
     bridgeGroup.add(billboard2);
 
+    // Fluffy sunset clouds floating alongside and beneath the canal bridge
+    this.buildBridgeClouds(bridgeGroup);
+
     this.scene.add(bridgeGroup);
 
     // 5. TIMELINE: MILESTONE SIGNPOSTS (2023, 2024, 2025, 2026)
@@ -670,47 +680,10 @@ export class World {
       },
     });
 
-    // 7. CONTACT HUB (DAY BIOME): Connected Spheres Landmark with @ and GitHub beacon
+    // 7. CONTACT HUB (DAY BIOME): Brussels Atomium-Style Connected Spheres Landmark
     const contactHub = new THREE.Group();
     contactHub.position.set(-60, 0, -200);
-
-    const sphereMat = new THREE.MeshStandardMaterial({
-      color: 0x4EA8DE,
-      metalness: 0.6,
-      roughness: 0.2,
-      flatShading: true,
-    });
-
-    // Connected geometric spheres
-    const centerSphere = new THREE.Mesh(new THREE.IcosahedronGeometry(4.5, 2), sphereMat);
-    centerSphere.position.y = 7.5;
-    centerSphere.castShadow = true;
-    contactHub.add(centerSphere);
-
-    const orb1 = new THREE.Mesh(new THREE.IcosahedronGeometry(2.2, 1), sphereMat);
-    orb1.position.set(5.5, 11, 0);
-    contactHub.add(orb1);
-
-    const orb2 = new THREE.Mesh(new THREE.IcosahedronGeometry(2.0, 1), sphereMat);
-    orb2.position.set(-5.0, 10.5, 2);
-    contactHub.add(orb2);
-
-    // Floating "@" and "GitHub" rings
-    this.contactRing = new THREE.Mesh(
-      new THREE.TorusGeometry(3.5, 0.35, 12, 32),
-      this.goldMat
-    );
-    this.contactRing.position.set(0, 8.5, 0);
-    this.contactRing.rotation.x = Math.PI / 2;
-    contactHub.add(this.contactRing);
-
-    this.scene.add(contactHub);
-    this.animatedObjects.push({
-      mesh: this.contactRing,
-      update: (delta) => {
-        this.contactRing.rotation.z += delta * 0.5;
-      },
-    });
+    this.buildAtomiumLandmark(contactHub);
 
     // 8. GIANT 3D LETTERS STREET: Oversized Pink Extruded "HELLO"
     const lettersGroup = new THREE.Group();
@@ -742,6 +715,9 @@ export class World {
     const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 12), galleryMat);
     leftWall.position.set(-8, 4, 0);
     finalRoom.add(leftWall);
+
+    // Modern interior furniture (sofa, coffee table, succulent, arched brass lamp)
+    this.buildGalleryRoomFurniture(finalRoom);
 
     // Framed pictures on the walls
     const frameGeo = new THREE.BoxGeometry(3.2, 2.4, 0.2);
@@ -775,6 +751,9 @@ export class World {
     finalRoom.add(doorPanel);
 
     this.scene.add(finalRoom);
+
+    // Parked Scooter outside Gallery Room doorway (where player dismounts to walk inside)
+    this.buildParkedScooter(-85, 0.35, -42, 0.2, false);
   }
 
   createBillboard(title, desc) {
@@ -931,6 +910,592 @@ export class World {
       group.add(charGroup);
     }
     return group;
+  }
+
+  buildParkedScooter(x, y, z, rotY, withSpeechBadge = false) {
+    const scooter = new THREE.Group();
+    scooter.position.set(x, y, z);
+    scooter.rotation.y = rotY;
+
+    const yellowMat = new THREE.MeshStandardMaterial({
+      color: 0xF7B731,
+      roughness: 0.4,
+      metalness: 0.1,
+      flatShading: true,
+    });
+    const chromeMat = new THREE.MeshStandardMaterial({
+      color: 0xEEEEEE,
+      metalness: 0.8,
+      roughness: 0.2,
+      flatShading: true,
+    });
+    const blackMat = new THREE.MeshStandardMaterial({
+      color: 0x222222,
+      roughness: 0.7,
+      flatShading: true,
+    });
+    const lightMat = new THREE.MeshBasicMaterial({ color: 0xFFF9E6 });
+
+    // Foot deck
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.14, 1.6), yellowMat);
+    deck.position.set(0, 0.35, 0);
+    deck.castShadow = true;
+    scooter.add(deck);
+
+    // Front apron shield
+    const shield = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.9, 0.18), yellowMat);
+    shield.position.set(0, 0.85, 0.75);
+    shield.rotation.x = -0.15;
+    shield.castShadow = true;
+    scooter.add(shield);
+
+    // Headlight
+    const headlight = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.1, 12), lightMat);
+    headlight.rotation.x = Math.PI / 2;
+    headlight.position.set(0, 1.25, 0.85);
+    scooter.add(headlight);
+
+    // Seat
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.75), blackMat);
+    seat.position.set(0, 0.72, -0.3);
+    seat.castShadow = true;
+    scooter.add(seat);
+
+    // Rear engine cover
+    const rear = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.8), yellowMat);
+    rear.position.set(0, 0.5, -0.5);
+    rear.castShadow = true;
+    scooter.add(rear);
+
+    // Handlebars
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.9, 8), chromeMat);
+    stem.position.set(0, 0.95, 0.8);
+    scooter.add(stem);
+
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.05), chromeMat);
+    bar.position.set(0, 1.45, 0.8);
+    scooter.add(bar);
+
+    // Wheels
+    const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.14, 16);
+    wheelGeo.rotateZ(Math.PI / 2);
+    const frontWheel = new THREE.Mesh(wheelGeo, blackMat);
+    frontWheel.position.set(0, 0.28, 0.8);
+    frontWheel.castShadow = true;
+    scooter.add(frontWheel);
+
+    const rearWheel = new THREE.Mesh(wheelGeo, blackMat);
+    rearWheel.position.set(0, 0.28, -0.6);
+    rearWheel.castShadow = true;
+    scooter.add(rearWheel);
+
+    // Kickstand leaning
+    scooter.rotation.z = -0.08;
+
+    // Optional floating "Hi!" speech bubble badge
+    if (withSpeechBadge) {
+      const badgeGroup = new THREE.Group();
+      badgeGroup.position.set(0, 2.4, 0.3);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+
+      // Rounded speech bubble background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(16, 16, 224, 96, 24);
+      ctx.fill();
+
+      // Bold cheerful text
+      ctx.fillStyle = '#2C3A47';
+      ctx.font = 'bold 56px Orbitron, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Hi!', 128, 64);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      const badgeMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.8, 0.9),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
+      );
+      badgeGroup.add(badgeMesh);
+      scooter.add(badgeGroup);
+
+      this.animatedObjects.push({
+        mesh: badgeGroup,
+        update: () => {
+          badgeGroup.position.y = 2.4 + Math.sin(Date.now() * 0.0035) * 0.14;
+          badgeGroup.rotation.y = Math.sin(Date.now() * 0.002) * 0.12;
+        },
+      });
+    }
+
+    this.scene.add(scooter);
+    return scooter;
+  }
+
+  buildEiffelTowerArch() {
+    const eiffel = new THREE.Group();
+    // Spanning the avenue between Stop 2 and Stop 3
+    eiffel.position.set(70, 0, -52);
+    eiffel.rotation.y = -0.52;
+
+    const ironMat = new THREE.MeshStandardMaterial({
+      color: 0xE07A5F, // warm terracotta iron
+      roughness: 0.6,
+      metalness: 0.3,
+      flatShading: true,
+    });
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xFFD166,
+      roughness: 0.3,
+      metalness: 0.7,
+      emissive: 0xF7B731,
+      emissiveIntensity: 0.4,
+    });
+
+    const legWidth = 2.4;
+    const roadClearance = 11.0;
+    const baseSpanZ = 7.5;
+
+    // 4 Grand Tapered Lattice Legs straddling the road
+    const legPositions = [
+      [-roadClearance / 2 - 1.2, baseSpanZ],
+      [-roadClearance / 2 - 1.2, -baseSpanZ],
+      [roadClearance / 2 + 1.2, baseSpanZ],
+      [roadClearance / 2 + 1.2, -baseSpanZ],
+    ];
+
+    legPositions.forEach(([lx, lz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(legWidth, 14, legWidth), ironMat);
+      leg.position.set(lx, 7, lz);
+      leg.rotation.z = lx > 0 ? 0.12 : -0.12;
+      leg.rotation.x = lz > 0 ? -0.1 : 0.1;
+      leg.castShadow = true;
+      eiffel.add(leg);
+    });
+
+    // Lower Arch Vault overhead
+    const archCurve = new THREE.Mesh(
+      new THREE.BoxGeometry(roadClearance + 5, 2.2, 16),
+      ironMat
+    );
+    archCurve.position.set(0, 13.5, 0);
+    archCurve.castShadow = true;
+    eiffel.add(archCurve);
+
+    // Decorative Arch Lattice Trim
+    const archTrim = new THREE.Mesh(
+      new THREE.TorusGeometry(roadClearance / 2 + 0.8, 0.45, 8, 24, Math.PI),
+      goldMat
+    );
+    archTrim.position.set(0, 11.5, 0);
+    archTrim.rotation.z = Math.PI;
+    eiffel.add(archTrim);
+
+    // First Platform Balustrade Deck (Observation Level 1)
+    const platform1 = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 18), ironMat);
+    platform1.position.set(0, 14.8, 0);
+    platform1.castShadow = true;
+    eiffel.add(platform1);
+
+    // Second Tapered Tower Tier
+    const tier2 = new THREE.Mesh(new THREE.BoxGeometry(9.5, 12, 10.5), ironMat);
+    tier2.position.set(0, 21.0, 0);
+    tier2.castShadow = true;
+    eiffel.add(tier2);
+
+    // Platform Level 2
+    const platform2 = new THREE.Mesh(new THREE.BoxGeometry(8, 0.8, 8.5), goldMat);
+    platform2.position.set(0, 27.2, 0);
+    eiffel.add(platform2);
+
+    // Upper Spire & Beacon
+    const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 3.2, 18, 4), ironMat);
+    spire.position.set(0, 36.5, 0);
+    spire.rotation.y = Math.PI / 4;
+    spire.castShadow = true;
+    eiffel.add(spire);
+
+    // Glowing Golden Beacon at Apex
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(1.4, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xFFE082 })
+    );
+    beacon.position.set(0, 46.0, 0);
+    eiffel.add(beacon);
+
+    const beaconLight = new THREE.PointLight(0xFFD166, 2.5, 60);
+    beaconLight.position.set(0, 46.0, 0);
+    eiffel.add(beaconLight);
+
+    this.scene.add(eiffel);
+  }
+
+  buildFerrisWheel() {
+    const wheelGroup = new THREE.Group();
+    // Overlooking the horizon in sunset view
+    wheelGroup.position.set(210, 0, -80);
+    wheelGroup.rotation.y = -0.35;
+
+    const steelMat = new THREE.MeshStandardMaterial({
+      color: 0xEE9B83, // warm sunset coral steel
+      roughness: 0.5,
+      metalness: 0.4,
+      flatShading: true,
+    });
+
+    // Foundation concrete pylons
+    const basePylonL = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 6), this.matCurb);
+    basePylonL.position.set(0, 1.5, -8);
+    wheelGroup.add(basePylonL);
+
+    const basePylonR = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 6), this.matCurb);
+    basePylonR.position.set(0, 1.5, 8);
+    wheelGroup.add(basePylonR);
+
+    // Diagonal A-Frame Support Legs
+    const supportGeo = new THREE.CylinderGeometry(0.6, 0.9, 34, 6);
+    const leg1 = new THREE.Mesh(supportGeo, steelMat);
+    leg1.position.set(-6, 16, -6);
+    leg1.rotation.z = -0.18;
+    leg1.rotation.x = -0.15;
+    leg1.castShadow = true;
+    wheelGroup.add(leg1);
+
+    const leg2 = new THREE.Mesh(supportGeo, steelMat);
+    leg2.position.set(6, 16, -6);
+    leg2.rotation.z = 0.18;
+    leg2.rotation.x = -0.15;
+    leg2.castShadow = true;
+    wheelGroup.add(leg2);
+
+    const leg3 = new THREE.Mesh(supportGeo, steelMat);
+    leg3.position.set(-6, 16, 6);
+    leg3.rotation.z = -0.18;
+    leg3.rotation.x = 0.15;
+    leg3.castShadow = true;
+    wheelGroup.add(leg3);
+
+    const leg4 = new THREE.Mesh(supportGeo, steelMat);
+    leg4.position.set(6, 16, 6);
+    leg4.rotation.z = 0.18;
+    leg4.rotation.x = 0.15;
+    leg4.castShadow = true;
+    wheelGroup.add(leg4);
+
+    // Rotating Wheel Assembly at y: 31
+    const rotatingWheel = new THREE.Group();
+    rotatingWheel.position.set(0, 31, 0);
+
+    // Central axle hub
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 5, 12), steelMat);
+    hub.rotation.x = Math.PI / 2;
+    rotatingWheel.add(hub);
+
+    const wheelRadius = 24;
+    const numGondolas = 16;
+    const gondolaList = [];
+
+    // Outer & Inner concentric rims
+    const outerRimGeo = new THREE.TorusGeometry(wheelRadius, 0.35, 8, 48);
+    const outerRim = new THREE.Mesh(outerRimGeo, steelMat);
+    rotatingWheel.add(outerRim);
+
+    const innerRimGeo = new THREE.TorusGeometry(wheelRadius * 0.72, 0.25, 8, 36);
+    const innerRim = new THREE.Mesh(innerRimGeo, steelMat);
+    rotatingWheel.add(innerRim);
+
+    const gondolaColors = [0xF7B731, 0xFF70A6, 0x2EC4B6, 0xB388FF, 0xFF6B35];
+
+    // Radial Spokes and Gondolas
+    for (let i = 0; i < numGondolas; i++) {
+      const angle = (i / numGondolas) * Math.PI * 2;
+
+      // Radial spoke strut
+      const spoke = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12, 0.12, wheelRadius * 2, 6),
+        steelMat
+      );
+      spoke.rotation.z = angle;
+      rotatingWheel.add(spoke);
+
+      // Passenger Gondola Pod
+      const gondolaPivot = new THREE.Group();
+      gondolaPivot.position.set(
+        Math.cos(angle) * wheelRadius,
+        Math.sin(angle) * wheelRadius,
+        0
+      );
+
+      const colorMat = new THREE.MeshStandardMaterial({
+        color: gondolaColors[i % gondolaColors.length],
+        roughness: 0.4,
+        metalness: 0.1,
+        flatShading: true,
+      });
+
+      // Gondola cabin
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 1.8), colorMat);
+      cabin.position.y = -1.2;
+      cabin.castShadow = true;
+      gondolaPivot.add(cabin);
+
+      // Gondola roof canopy
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.8, 1.0, 4), this.roofMat);
+      roof.position.y = 0.3;
+      roof.rotation.y = Math.PI / 4;
+      gondolaPivot.add(roof);
+
+      rotatingWheel.add(gondolaPivot);
+      gondolaList.push(gondolaPivot);
+    }
+
+    wheelGroup.add(rotatingWheel);
+    this.scene.add(wheelGroup);
+
+    // Register rotation & counter-rotation for upright gondolas
+    this.animatedObjects.push({
+      update: (delta) => {
+        rotatingWheel.rotation.z += delta * 0.12;
+        const currentRot = rotatingWheel.rotation.z;
+        gondolaList.forEach((g) => {
+          g.rotation.z = -currentRot;
+        });
+      },
+    });
+  }
+
+  buildBridgeClouds(bridgeGroup) {
+    const cloudMat = new THREE.MeshLambertMaterial({
+      color: 0xFED0C5,
+      transparent: true,
+      opacity: 0.85,
+      flatShading: true,
+    });
+
+    const cloudPositions = [
+      // Flanking north railing
+      [-8, 2.0, -14], [-9, 3.2, -6], [-8, 2.4, 2], [-9, 3.0, 10], [-8, 2.2, 16],
+      // Flanking south railing
+      [8, 2.0, -14], [9, 3.2, -6], [8, 2.4, 2], [9, 3.0, 10], [8, 2.2, 16],
+      // Floating underneath bridge piers
+      [0, 1.2, -18], [0, 1.4, 18], [-4, 1.8, 0], [4, 1.8, 0]
+    ];
+
+    cloudPositions.forEach(([cx, cy, cz]) => {
+      const puffCluster = new THREE.Group();
+      puffCluster.position.set(cx, cy, cz);
+
+      const numPuffs = 3 + Math.floor(Math.random() * 3);
+      for (let p = 0; p < numPuffs; p++) {
+        const puff = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(2.5 + Math.random() * 2.2, 1),
+          cloudMat
+        );
+        puff.position.set(
+          (Math.random() - 0.5) * 3,
+          (Math.random() - 0.5) * 1.5,
+          (Math.random() - 0.5) * 3
+        );
+        puffCluster.add(puff);
+      }
+      bridgeGroup.add(puffCluster);
+    });
+  }
+
+  buildAtomiumLandmark(contactHub) {
+    const chromeMat = new THREE.MeshStandardMaterial({
+      color: 0xEAEAEA,
+      metalness: 0.9,
+      roughness: 0.15,
+      flatShading: true,
+    });
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xFFD166,
+      metalness: 0.8,
+      roughness: 0.2,
+      emissive: 0xF7B731,
+      emissiveIntensity: 0.4,
+    });
+
+    // Central Sphere at height y: 12
+    const centerSphere = new THREE.Mesh(new THREE.IcosahedronGeometry(3.8, 2), chromeMat);
+    centerSphere.position.set(0, 12, 0);
+    centerSphere.castShadow = true;
+    contactHub.add(centerSphere);
+
+    // 8 Outer Corner Spheres in cubic symmetry
+    const d = 6.2;
+    const outerSphereCoords = [
+      [-d, 12 - d, -d], [d, 12 - d, -d], [-d, 12 - d, d], [d, 12 - d, d],
+      [-d, 12 + d, -d], [d, 12 + d, -d], [-d, 12 + d, d], [d, 12 + d, d],
+    ];
+
+    const tubeGeo = new THREE.CylinderGeometry(0.45, 0.45, 1, 8);
+
+    outerSphereCoords.forEach(([ox, oy, oz]) => {
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(2.2, 2), chromeMat);
+      orb.position.set(ox, oy, oz);
+      orb.castShadow = true;
+      contactHub.add(orb);
+
+      // Connecting tube from center to outer sphere
+      const tube = new THREE.Mesh(tubeGeo, chromeMat);
+      const start = new THREE.Vector3(0, 12, 0);
+      const end = new THREE.Vector3(ox, oy, oz);
+      const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+      const len = start.distanceTo(end);
+
+      tube.position.copy(mid);
+      tube.scale.set(1, len, 1);
+      tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3().subVectors(end, start).normalize());
+      contactHub.add(tube);
+    });
+
+    // 3 Floating Orbital Rings with Contact Icons
+    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(8.5, 0.28, 8, 36), goldMat);
+    ring1.position.set(0, 12, 0);
+    ring1.rotation.x = Math.PI / 3;
+    contactHub.add(ring1);
+
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(10.5, 0.24, 8, 36), this.matWater);
+    ring2.position.set(0, 12, 0);
+    ring2.rotation.y = Math.PI / 4;
+    contactHub.add(ring2);
+
+    this.scene.add(contactHub);
+
+    this.animatedObjects.push({
+      update: (delta) => {
+        ring1.rotation.z += delta * 0.4;
+        ring2.rotation.x += delta * 0.3;
+        contactHub.rotation.y += delta * 0.08;
+      },
+    });
+  }
+
+  buildGalleryRoomFurniture(finalRoom) {
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5C4033, roughness: 0.7 });
+    const fabricMat = new THREE.MeshLambertMaterial({ color: 0x1E272C, flatShading: true }); // dark slate/terracotta couch
+    const cushionMat = new THREE.MeshLambertMaterial({ color: 0xE76F51, flatShading: true });
+    const brassMat = new THREE.MeshStandardMaterial({ color: 0xFFD166, metalness: 0.8, roughness: 0.2 });
+
+    // --- COUCH / SOFA ---
+    const sofaGroup = new THREE.Group();
+    sofaGroup.position.set(-3.8, 0, 1.5);
+    sofaGroup.rotation.y = 0.25;
+
+    // Sofa base
+    const sofaBase = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.45, 2.2), woodMat);
+    sofaBase.position.y = 0.45;
+    sofaBase.castShadow = true;
+    sofaGroup.add(sofaBase);
+
+    // Sofa seat cushions
+    const seatCushion1 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.45, 1.9), cushionMat);
+    seatCushion1.position.set(-1.25, 0.85, 0);
+    sofaGroup.add(seatCushion1);
+
+    const seatCushion2 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.45, 1.9), cushionMat);
+    seatCushion2.position.set(1.25, 0.85, 0);
+    sofaGroup.add(seatCushion2);
+
+    // Sofa backrest
+    const backrest = new THREE.Mesh(new THREE.BoxGeometry(5.0, 1.2, 0.5), fabricMat);
+    backrest.position.set(0, 1.45, -0.85);
+    backrest.castShadow = true;
+    sofaGroup.add(backrest);
+
+    // Sofa armrests
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.9, 2.1), fabricMat);
+    armL.position.set(-2.55, 1.1, 0);
+    sofaGroup.add(armL);
+
+    const armR = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.9, 2.1), fabricMat);
+    armR.position.set(2.55, 1.1, 0);
+    sofaGroup.add(armR);
+
+    // Sofa legs
+    [[-2.2, 0.2, -0.8], [2.2, 0.2, -0.8], [-2.2, 0.2, 0.8], [2.2, 0.2, 0.8]].forEach(([lx, ly, lz]) => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 0.4, 6), woodMat);
+      leg.position.set(lx, ly, lz);
+      sofaGroup.add(leg);
+    });
+    finalRoom.add(sofaGroup);
+
+    // --- COFFEE TABLE ---
+    const tableGroup = new THREE.Group();
+    tableGroup.position.set(-3.2, 0, 4.0);
+
+    const tableTop = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 0.12, 16), woodMat);
+    tableTop.position.y = 0.65;
+    tableTop.castShadow = true;
+    tableGroup.add(tableTop);
+
+    [[-0.8, 0.32, -0.8], [0.8, 0.32, -0.8], [0, 0.32, 0.9]].forEach(([tx, ty, tz]) => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.04, 0.65, 6), woodMat);
+      leg.position.set(tx, ty, tz);
+      tableGroup.add(leg);
+    });
+
+    // Coffee mug & small succulent on table
+    const mug = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.1, 0.22, 8),
+      new THREE.MeshLambertMaterial({ color: 0xF2E9E4 })
+    );
+    mug.position.set(-0.35, 0.82, 0.15);
+    tableGroup.add(mug);
+
+    const plantPot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.14, 0.2, 8),
+      new THREE.MeshLambertMaterial({ color: 0xE76F51 })
+    );
+    plantPot.position.set(0.3, 0.81, -0.2);
+    tableGroup.add(plantPot);
+
+    const succulent = new THREE.Mesh(
+      new THREE.DodecahedronGeometry(0.15, 1),
+      new THREE.MeshLambertMaterial({ color: 0x588157 })
+    );
+    succulent.position.set(0.3, 0.98, -0.2);
+    tableGroup.add(succulent);
+
+    finalRoom.add(tableGroup);
+
+    // --- ARCHED FLOOR LAMP ---
+    const lampGroup = new THREE.Group();
+    lampGroup.position.set(-6.2, 0, 0.5);
+
+    const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.15, 12), brassMat);
+    lampBase.position.y = 0.08;
+    lampGroup.add(lampBase);
+
+    // Curved lamp pole
+    const poleCurve = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 4.6, 8), brassMat);
+    poleCurve.position.set(0, 2.3, 0);
+    lampGroup.add(poleCurve);
+
+    const lampShade = new THREE.Mesh(
+      new THREE.ConeGeometry(0.7, 0.6, 12, 1, true),
+      new THREE.MeshStandardMaterial({
+        color: 0xFFF3B0,
+        emissive: 0xFFA07A,
+        emissiveIntensity: 0.8,
+        side: THREE.DoubleSide,
+      })
+    );
+    lampShade.position.set(1.2, 4.2, 0);
+    lampShade.rotation.x = Math.PI;
+    lampGroup.add(lampShade);
+
+    const warmLight = new THREE.PointLight(0xFFE3B3, 1.8, 12);
+    warmLight.position.set(1.2, 4.0, 0);
+    lampGroup.add(warmLight);
+
+    finalRoom.add(lampGroup);
   }
 
   update(delta, playerPos) {
