@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { World } from './world.js';
 import { Player } from './player.js';
 import { UIManager } from './ui.js';
+import './index.css';
 
 class App {
   constructor() {
@@ -32,22 +33,45 @@ class App {
     requestAnimationFrame(this.animate);
   }
 
+  showSimpleFallback() {
+    const simpleModal = document.getElementById('simple-version-modal');
+    if (simpleModal) {
+      simpleModal.classList.remove('hidden');
+      simpleModal.classList.add('flex');
+    }
+  }
+
   initThree() {
     // Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xFCA88E); // Sunset peach
 
-    // Camera
+    // Camera with portrait-aware FOV
     const aspect = window.innerWidth / window.innerHeight;
-    this.camera = new THREE.PerspectiveCamera(45, aspect, 0.5, 650);
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const fov = isPortrait ? 72 : 45;
+    this.camera = new THREE.PerspectiveCamera(fov, aspect, 0.5, 650);
     this.camera.position.set(0, 4, 10);
 
-    // Renderer
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      powerPreference: 'high-performance',
-      alpha: false,
-    });
+    // Renderer with WebGL error fallback
+    try {
+      this.renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        powerPreference: 'high-performance',
+        alpha: false,
+      });
+    } catch (e) {
+      console.error('WebGL initialization failed, falling back to simple version:', e);
+      this.showSimpleFallback();
+      return;
+    }
+
+    this.renderer.domElement.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault();
+      console.warn('WebGL Context Lost. Displaying simple HTML fallback.');
+      this.showSimpleFallback();
+    }, false);
+
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Performance target: Cap DPR at 2 (1.5 on mobile)
@@ -104,7 +128,14 @@ class App {
 
       // Also load lil-gui for parameter manipulation
       import('lil-gui').then(({ GUI }) => {
-        const gui = new GUI({ title: '3D World Inspector' });
+        const gui = new GUI({ title: '3D World Inspector', autoPlace: false });
+        gui.domElement.style.position = 'fixed';
+        gui.domElement.style.top = '72px';
+        gui.domElement.style.left = '16px';
+        gui.domElement.style.zIndex = '999';
+        gui.domElement.style.maxWidth = '240px';
+        document.body.appendChild(gui.domElement);
+
         const camFolder = gui.addFolder('Camera');
         camFolder.add(this.camera, 'fov', 30, 80).onChange(() => this.camera.updateProjectionMatrix());
 
@@ -119,12 +150,41 @@ class App {
     }
   }
 
+  enableLowQuality() {
+    if (this.isLowQuality) return;
+    this.isLowQuality = true;
+    console.warn('FPS below 30 detected: Auto-lowering quality settings for smooth performance.');
+    if (this.renderer) {
+      this.renderer.shadowMap.enabled = false;
+      this.renderer.setPixelRatio(1.0);
+    }
+    if (this.world && typeof this.world.enableLowQualityMode === 'function') {
+      this.world.enableLowQualityMode();
+    }
+  }
+
   setupEvents() {
-    // Window Resize
-    window.addEventListener('resize', () => {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
+    // Window Resize & Orientation Change
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const isPortrait = height > width;
+
+      this.camera.fov = isPortrait ? 72 : 45;
+      this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+      if (this.renderer) {
+        this.renderer.setSize(width, height);
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || width < 768;
+        const maxDPR = isMobile ? 1.5 : 2.0;
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDPR));
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(handleResize, 100);
     });
 
     // Pause when tab hidden and prevent delta spikes on resume
@@ -143,6 +203,16 @@ class App {
       this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFpsUpdate));
       this.frameCount = 0;
       this.lastFpsUpdate = now;
+
+      // Auto-lower quality if FPS drops below 30 over several checks (after initial 3s grace period)
+      if (now > 3000 && this.fps < 30) {
+        this.lowFpsCount = (this.lowFpsCount || 0) + 1;
+        if (this.lowFpsCount >= 4 && !this.isLowQuality) {
+          this.enableLowQuality();
+        }
+      } else {
+        this.lowFpsCount = Math.max(0, (this.lowFpsCount || 0) - 1);
+      }
     }
   }
 

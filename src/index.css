@@ -5,129 +5,106 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #000000;
-    color: #9a9a9a;
+    background-color: #0F1418;
+    color: #E2E8F0;
+    height: 100%;
+    min-height: 100dvh;
+    width: 100%;
+    overflow-x: clip;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    background-color: #000000;
-    color: #9a9a9a;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
+    background-color: #0F1418;
+    color: #E2E8F0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    line-height: 1.5;
+    height: 100%;
+    min-height: 100dvh;
+    width: 100%;
+    overflow-x: clip;
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 
+  /* Headings with Orbitron display font */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.03em;
-    line-height: 0.95;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
     color: #FFFFFF;
   }
 }
 
-/* Glass card utility */
-.glass-card {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Safe Area Insets */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
 }
 
-.glass-card:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.18);
+.safe-top {
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
 }
 
-/* Subtle Film Grain Noise Overlay */
-.film-grain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  content: "";
-  opacity: 0.025;
-  pointer-events: none;
-  z-index: 999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+.safe-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
 }
 
-/* Radial spotlight gradients */
-.radial-spotlight {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+.safe-left {
+  padding-left: max(16px, env(safe-area-inset-left, 16px));
 }
 
-.radial-spotlight-top {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.07) 0%, rgba(0, 0, 0, 0) 70%);
+.safe-right {
+  padding-right: max(16px, env(safe-area-inset-right, 16px));
 }
 
-/* Small uppercase pill label */
-.pill-label {
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #888888;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-/* Marquee gradient edge masks */
-.marquee-mask {
-  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-}
-
-/* Logo monochrome effect */
-.tech-logo {
-  filter: grayscale(100%);
-  opacity: 0.5;
-  transition: filter 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-}
-
-.tech-logo:hover {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: translateY(-2px);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Lenis smooth scroll recommended styles */
-html.lenis, html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
+/* Canvas container locked to dvh with no browser scroll interference */
+#canvas-container {
+  height: 100dvh;
+  width: 100%;
+  touch-action: none;
   overflow: hidden;
 }
 
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
+/* High contrast glass HUD */
+.glass-hud {
+  background: rgba(18, 22, 28, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
+}
+
+.glow-text {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 209, 102, 0.45);
+}
+
+/* Minimum 44x44px touch targets */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sound equalizer bar bounce */
+@keyframes eqBounce {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
+}
+
+/* Loader scooter animation */
+@keyframes scooterDrive {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+.scooter-anim {
+  animation: scooterDrive 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

@@ -1525,4 +1525,12 @@ export class World {
       }
     }
   }
+
+  enableLowQualityMode() {
+    if (this.isLowQuality) return;
+    this.isLowQuality = true;
+    if (this.sunLight) {
+      this.sunLight.castShadow = false;
+    }
+  }
 }

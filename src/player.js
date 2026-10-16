@@ -333,10 +333,14 @@ export class Player {
       }
     });
 
-    // 3. TOUCH DRAG FOR SCROLL & CAMERA
+    // 3. TOUCH DRAG FOR SCROLL & CAMERA WITH MOMENTUM
     let touchStartY = 0;
     let touchStartX = 0;
     let isTouchActive = false;
+    let lastTouchY = 0;
+    let lastTouchTime = 0;
+    let touchVelocity = 0;
+    this.touchMomentum = 0;
 
     window.addEventListener('touchstart', (e) => {
       if (e.target.closest('#menu-panel') || e.target.closest('#simple-version-modal') || e.target.closest('#joystick-base')) {
@@ -346,21 +350,36 @@ export class Player {
         isTouchActive = true;
         touchStartY = e.touches[0].clientY;
         touchStartX = e.touches[0].clientX;
+        lastTouchY = touchStartY;
+        lastTouchTime = performance.now();
+        touchVelocity = 0;
+        this.touchMomentum = 0;
       }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
       if (!isTouchActive || e.touches.length === 0) return;
       const currentY = e.touches[0].clientY;
-      const deltaY = touchStartY - currentY; // Swipe up = drive forward
-      touchStartY = currentY;
+      const now = performance.now();
+      const dt = Math.max(1, now - lastTouchTime);
+      const deltaY = lastTouchY - currentY; // Swipe up = drive forward
+
+      touchVelocity = deltaY / dt; // pixels per ms
+      lastTouchY = currentY;
+      lastTouchTime = now;
 
       const increment = deltaY * 0.0012;
       this.targetProgress = (this.targetProgress + increment + 1) % 1;
     }, { passive: true });
 
     window.addEventListener('touchend', () => {
-      isTouchActive = false;
+      if (isTouchActive) {
+        isTouchActive = false;
+        // Impart momentum damping if gesture ended with velocity
+        if (Math.abs(touchVelocity) > 0.05) {
+          this.touchMomentum = touchVelocity * 0.0006;
+        }
+      }
     }, { passive: true });
 
     // 4. MOUSE DRAG FOR CAMERA ORBIT
@@ -437,6 +456,15 @@ export class Player {
       this.targetProgress = (this.targetProgress + baseKeySpeed * delta + 1) % 1;
     } else if (isBackward) {
       this.targetProgress = (this.targetProgress - (baseKeySpeed * 0.7) * delta + 1) % 1;
+    }
+
+    // Apply & decay touch swipe momentum
+    if (this.touchMomentum && Math.abs(this.touchMomentum) > 0.000001) {
+      this.targetProgress = (this.targetProgress + this.touchMomentum * delta * 60 + 1) % 1;
+      this.touchMomentum *= Math.exp(-4.5 * delta);
+      if (Math.abs(this.touchMomentum) < 0.000001) {
+        this.touchMomentum = 0;
+      }
     }
 
     // 2. Exponential Damping: progress smoothly chases targetProgress
@@ -517,8 +545,13 @@ export class Player {
 
     // Follow offset behind the vehicle's/character's direction
     const currentAngle = this.group.rotation.y + this.orbitYaw;
-    const distance = this.isMounted ? 8.5 : 6.2;
-    const baseHeight = this.isMounted ? 4.0 : 2.8;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const distance = isPortrait
+      ? (this.isMounted ? 11.5 : 8.8)
+      : (this.isMounted ? 8.5 : 6.2);
+    const baseHeight = isPortrait
+      ? (this.isMounted ? 5.2 : 3.8)
+      : (this.isMounted ? 4.0 : 2.8);
     const height = baseHeight + this.orbitPitch * (this.isMounted ? 3.5 : 2.5);
 
     const camX = this.position.x - Math.sin(currentAngle) * distance;
